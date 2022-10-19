@@ -1,7 +1,6 @@
 package controllers
 
 import javax.inject._
-import play.api._
 import play.api.mvc._
 import de.htwg.se.Skip_Bo.Skip_Bo
 /**
@@ -15,7 +14,13 @@ class SkipBoController @Inject()(cc: ControllerComponents) extends AbstractContr
   gameController.startGame(5)
   def skipBoAsText = gameController.gameToString(0)
 
+  def rules() = Action {
+    Ok(views.html.Skip_Bo.rules())
+  }
 
+  
+
+//---------------------------------------------------------------------------
   def about = Action {
     Ok(views.html.index())
   }
