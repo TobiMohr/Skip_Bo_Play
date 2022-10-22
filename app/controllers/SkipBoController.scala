@@ -18,6 +18,10 @@ class SkipBoController @Inject()(cc: ControllerComponents) extends AbstractContr
     Ok(views.html.Skip_Bo.rules())
   }
 
+  def board() = Action {
+    Ok(views.html.Skip_Bo.board(gameController))
+  }
+
   
 
 //---------------------------------------------------------------------------

@@ -1,23 +1,96 @@
-@(controller: SkipBoController)
-<!DOCTYPE html>
-<html>
+@(controller: de.htwg.se.Skip_Bo.controller.controllerComponent.ControllerInterface)
 
-<head>
-    <title>Skip Bo</title>
+<!-- Short description of current game state -->
+@statusText= @{ controller.statusText }
 
-</head>
+<!-- Playername of the current Player -->
+@playerName = @{ controller.playerState.name }
 
-<body>
-    <div class="board-body">
-        <h1 class=header>This is Skip Bo</h1>
-        <div>
+<!-- current Player -->
+@playerState = @{ controller.playerState }
 
+<!-- Size of the current players hand -->
+@handSize = @{ controller.game.player(controller.playerState.getPlayer).cards.size }
+
+<!-- Handcards -->
+@firstHandCard = @{ controller.game.player(controller.playerState.getPlayer).cards(0).toString }
+@secondHandCard = @{ controller.game.player(controller.playerState.getPlayer).cards(1).toString }
+@thirdHandCard = @{ controller.game.player(controller.playerState.getPlayer).cards(2).toString }
+@fourthHandCard = @{ controller.game.player(controller.playerState.getPlayer).cards(3).toString }
+@fifthHandCard = @{ controller.game.player(controller.playerState.getPlayer).cards(4).toString }
+
+<!-- helpstacks -->
+
+
+<!-- ablageStapel -->
+@firstAblageStapel = @{ controller.game.stack(0).size.toString }
+@secondAblageStapel = @{ controller.game.stack(1).size.toString }
+@thirdAblageStapel = @{ controller.game.stack(2).size.toString }
+@fourthAblageStapel = @{ controller.game.stack(3).size.toString }
+
+
+@main("HTWG Skip Bo") {
+    <div class="gamecontainer">
+        <div class="gameButtons">
+            <button id="hand_Ablagestapel">Karte von Hand auf Ablagestapel</button><br>
+            <button id="hand_Hilfestapel">Karte von Hand auf Hilfsstapel</button><br>
+            <button id="hilfestapel_Ablagestapel">Karte von Hilfestapel auf Ablagestapel</button><br>
+            <button id="spielerstapel_ablagestapel">Karte vom Spielerstapel auf Ablagestapel</button><br>
         </div>
-
-        <div class="Player">
-            <h3>@SkipBoController.PlayerState.PlayerA.name</h3>
+        <div class="gameTextInputs">
+            <label for="whichCard">Welche Karte(Index 1 -> 5): </label>
+            <input type="text" id="whichCard">
+            <br>
+            <label for="whereCard">Wohin(Index 1 -> 5): </label>
+            <input type="text" id="whereCard">
+        </div>
+        <div class="board">
+            <h1>Spielfeld: </h1><br>
+            <div class="spielerStapel">
+                @if(controller.game.player.isEmpty){
+                    <p>Spielerstapel: | leer | - verbleibende Karten: 0</p>
+                } else {
+                    @if(!controller.game.player(controller.playerState.getPlayer).stack.isEmpty){
+                        <p>Spielerstapel: | @controller.game.player(controller.playerState.getPlayer).stack.head.toString | - verbleibende Karten: @controller.game.player(controller.playerState.getPlayer).stack.size.toString </p>
+                    } else {
+                        <p>Spielerstapel: | leer | - verbleibende Karten: 0</p>
+                    }
+                }
+            </div>
+            <br><br>
+            <div class="hand">
+                @if(controller.game.player.isEmpty){
+                    <p>Handkarten: | 0 | | 0 | | 0 | | 0 | | 0 |</p>
+                } else {
+                    @if(handSize == 5){
+                        <p>Handkarten: | @firstHandCard |  | @secondHandCard |  | @thirdHandCard |  | @fourthHandCard |  | @fifthHandCard |</p>
+                    } else if(handSize == 4){
+                    <p>Handkarten: | @firstHandCard |  | @secondHandCard |  | @thirdHandCard |  | @fourthHandCard |</p>
+                    } else if(handSize == 3){
+                    <p>Handkarten: | @firstHandCard |  | @secondHandCard |  | @thirdHandCard |</p>
+                    } else if(handSize == 2){
+                    <p>Handkarten: | @firstHandCard |  | @secondHandCard |</p>
+                    } else if(handSize == 1){
+                    <p>Handkarten: | @firstHandCard |</p>
+                    }
+                }
+            </div>
+            <br><br>
+            <!-- TODO: helpstacks anzeigen -->
+            <div class="helpstacks">
+                @if(controller.game.player.isEmpty){
+                    <p>Hilfestapel: | leer |  | leer |  | leer |  | leer |</p>
+                } else  {
+                <p>Hilfestapel: | | </p>
+                }
+            </div>
+            <br><br>
+            <div class="ablageStapel">
+                <p>Ablagestapel: | @firstAblageStapel |  | @secondAblageStapel |  | @thirdAblageStapel |  | @fourthAblageStapel |</p>
+            </div>
+        </div>
+        <div class="gameState">
+            <div >@statusText</div>
         </div>
     </div>
-</body>
-
-</html>
+}
