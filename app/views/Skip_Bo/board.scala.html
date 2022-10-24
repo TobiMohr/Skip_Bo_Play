@@ -20,7 +20,10 @@
 @fifthHandCard = @{ controller.game.player(controller.playerState.getPlayer).cards(4).toString }
 
 <!-- helpstacks -->
-
+@firstHelpStackSize = @{ controller.game.player(controller.playerState.getPlayer).helpstack(0).size }
+@secondHelpStackSize = @{ controller.game.player(controller.playerState.getPlayer).helpstack(1).size }
+@thirdHelpStackSize = @{ controller.game.player(controller.playerState.getPlayer).helpstack(2).size }
+@fourthHelpStackSize = @{ controller.game.player(controller.playerState.getPlayer).helpstack(3).size }
 
 <!-- ablageStapel -->
 @firstAblageStapel = @{ controller.game.stack(0).size.toString }
@@ -32,10 +35,10 @@
 @main("HTWG Skip Bo") {
     <div class="gamecontainer">
         <div class="gameButtons">
-            <button id="hand_Ablagestapel">Karte von Hand auf Ablagestapel</button><br>
-            <button id="hand_Hilfestapel">Karte von Hand auf Hilfsstapel</button><br>
-            <button id="hilfestapel_Ablagestapel">Karte von Hilfestapel auf Ablagestapel</button><br>
-            <button id="spielerstapel_ablagestapel">Karte vom Spielerstapel auf Ablagestapel</button><br>
+            <button id="hand_Ablagestapel" onclick="hand_Ablagestapel_click()">Karte von Hand auf Ablagestapel</button><br>
+            <button id="hand_Hilfestapel" onclick="hand_Hilfestapel_click()">Karte von Hand auf Hilfsstapel</button><br>
+            <button id="hilfestapel_Ablagestapel" onclick="hilfestapel_Ablagestapel_click()">Karte von Hilfestapel auf Ablagestapel</button><br>
+            <button id="spielerstapel_Ablagestapel" onclick="spielerstapel_Ablagestapel_click()">Karte vom Spielerstapel auf Ablagestapel</button><br>
         </div>
         <div class="gameTextInputs">
             <label for="whichCard">Welche Karte(Index 1 -> 5): </label>
@@ -76,12 +79,33 @@
                 }
             </div>
             <br><br>
-            <!-- TODO: helpstacks anzeigen -->
             <div class="helpstacks">
                 @if(controller.game.player.isEmpty){
                     <p>Hilfestapel: | leer |  | leer |  | leer |  | leer |</p>
                 } else  {
-                <p>Hilfestapel: | | </p>
+                    <p>Hilfestapel:</p>
+                    @if(firstHelpStackSize == 0){
+                        <p>| leer |</p>
+                    } else {
+                        <p>| @controller.game.player(controller.playerState.getPlayer).helpstack(0).head.toString |</p>
+                    }
+                    @if(secondHelpStackSize == 0){
+                        <p>| leer |</p>
+                    } else {
+                        <p>| @controller.game.player(controller.playerState.getPlayer).helpstack(1).head.toString |</p>
+                    }
+                    @if(thirdHelpStackSize == 0){
+                        <p>| leer |</p>
+                    } else {
+                        <p>| @controller.game.player(controller.playerState.getPlayer).helpstack(2).head.toString |</p>
+                    }
+                    @if(fourthHelpStackSize == 0){
+                        <p>| leer |</p>
+                    } else {
+                        <p>| @controller.game.player(controller.playerState.getPlayer).helpstack(3).head.toString |</p>
+                    }
+
+
                 }
             </div>
             <br><br>
@@ -94,3 +118,25 @@
         </div>
     </div>
 }
+<script>
+    function hand_Ablagestapel_click()
+    {
+        val whichCard = document.getElementById("whichCard").value.toInt - 1;
+        val whereCard = document.getElementById("whereCard").value.toInt - 1;
+        controller.pushCardHand(whereCard, whichCard, controller.playerState.getPlayer, false);
+    }
+    function hand_Hilfestapel_click(){
+        val whichCard = document.getElementById("whichCard").value.toInt - 1;
+        val whereCard = document.getElementById("whereCard").value.toInt - 1;
+        controller.pushCardHand(whereCard, whichCard, controller.playerState.getPlayer, true);
+    }
+    function hilfestapel_Ablagestapel_click(){
+        val whichCard = document.getElementById("whichCard").value.toInt - 1;
+        val whereCard = document.getElementById("whereCard").value.toInt - 1;
+        controller.pushCardHelp(whereCard, whichCard, controller.playerState.getPlayer);
+    }
+    function spielerstapel_Ablagestapel_click(){
+        val whereCard = document.getElementbyId("whereCard").value.toInt - 1;
+        controller.pushCardPlayer(whereCard, controller.palyerState.getPlayer);
+    }
+</script>
