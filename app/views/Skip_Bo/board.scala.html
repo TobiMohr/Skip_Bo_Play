@@ -34,6 +34,7 @@
 
 @main("HTWG Skip Bo") {
     <div class="gamecontainer">
+        <h2>Aktionen:</h2>
         <div class="gameButtons">
             <button id="hand_Ablagestapel" onclick="hand_Ablagestapel_click()">Karte von Hand auf Ablagestapel</button><br>
             <button id="hand_Hilfestapel" onclick="hand_Hilfestapel_click()">Karte von Hand auf Hilfsstapel</button><br>
@@ -47,8 +48,10 @@
             <label for="whereCard">Wohin(Index 1 -> 5): </label>
             <input type="text" id="whereCard">
         </div>
+        <center>
         <div class="board">
-            <h1>Spielfeld: </h1><br>
+            <h4>Spieler @playerName ist am Zug:</h4>
+            -----------------------------------------------------------------------------------------
             <div class="spielerStapel">
                 @if(controller.game.player.isEmpty){
                     <p>Spielerstapel: | leer | - verbleibende Karten: 0</p>
@@ -113,6 +116,8 @@
                 <p>Ablagestapel: | @firstAblageStapel |  | @secondAblageStapel |  | @thirdAblageStapel |  | @fourthAblageStapel |</p>
             </div>
         </div>
+            -----------------------------------------------------------------------------------------
+        </center>
         <div class="gameState">
             <div >@statusText</div>
         </div>

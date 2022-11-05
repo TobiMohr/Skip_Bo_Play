@@ -26,10 +26,10 @@ class SkipBoController @Inject()(cc: ControllerComponents) extends AbstractContr
 
 //---------------------------------------------------------------------------
   def about = Action {
-    Ok(views.html.index())
+    Ok(skipBoAsText)
   }
 
   def skipBo = Action {
-    Ok(skipBoAsText)
+    Ok(views.html.index())
   }
 }
