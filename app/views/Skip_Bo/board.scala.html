@@ -33,25 +33,28 @@
 
 
 @main("HTWG Skip Bo") {
-    <div class="gamecontainer">
-        <h2>Aktionen:</h2>
-        <div class="gameButtons">
-            <button id="hand_Ablagestapel" onclick="hand_Ablagestapel_click()">Karte von Hand auf Ablagestapel</button><br>
-            <button id="hand_Hilfestapel" onclick="hand_Hilfestapel_click()">Karte von Hand auf Hilfsstapel</button><br>
-            <button id="hilfestapel_Ablagestapel" onclick="hilfestapel_Ablagestapel_click()">Karte von Hilfestapel auf Ablagestapel</button><br>
-            <button id="spielerstapel_Ablagestapel" onclick="spielerstapel_Ablagestapel_click()">Karte vom Spielerstapel auf Ablagestapel</button><br>
-        </div>
-        <div class="gameTextInputs">
-            <label for="whichCard">Welche Karte(Index 1 -> 5): </label>
-            <input type="text" id="whichCard">
+    <header class="header">
+        <link rel="stylesheet" href='@routes.Assets.versioned("stylesheets/board.css")' />
+        @if(playerName == "A"){
+            <div class="player">
+                <img class="playerIcon" id="playerAIcon" src='@routes.Assets.versioned("images/PlayerA.png")'>
+                <br>
+                <label for="playerAIcon">Player A</label>
+            </div>
+        } else {
+        <div class="player">
+            <img  class="playerIcon" id="playerBIcon" src='@routes.Assets.versioned("images/PlayerB.png")'>
             <br>
-            <label for="whereCard">Wohin(Index 1 -> 5): </label>
-            <input type="text" id="whereCard">
+            <label for="playerBIcon">Player B</label>
         </div>
+        }
+    </header>
+    <div class="gamecontainer">
         <center>
+                    <div class="gameState">
+                <div >@statusText</div>
+            </div>
         <div class="board">
-            <h4>Spieler @playerName ist am Zug:</h4>
-            -----------------------------------------------------------------------------------------
             <div class="spielerStapel">
                 @if(controller.game.player.isEmpty){
                     <p>Spielerstapel: | leer | - verbleibende Karten: 0</p>
@@ -116,10 +119,20 @@
                 <p>Ablagestapel: | @firstAblageStapel |  | @secondAblageStapel |  | @thirdAblageStapel |  | @fourthAblageStapel |</p>
             </div>
         </div>
-            -----------------------------------------------------------------------------------------
         </center>
-        <div class="gameState">
-            <div >@statusText</div>
+        <h2>Aktionen:</h2>
+        <div class="gameButtonsDiv">
+            <button class="gameButton" id="hand_Ablagestapel" onclick="hand_Ablagestapel_click()">Karte von Hand auf Ablagestapel</button>
+            <button class="gameButton" id="hand_Hilfestapel" onclick="hand_Hilfestapel_click()">Karte von Hand auf Hilfsstapel</button>
+            <button class="gameButton" id="hilfestapel_Ablagestapel" onclick="hilfestapel_Ablagestapel_click()">Karte von Hilfestapel auf Ablagestapel</button>
+            <button class="gameButton" id="spielerstapel_Ablagestapel" onclick="spielerstapel_Ablagestapel_click()">Karte vom Spielerstapel auf Ablagestapel</button>
+        </div>
+        <div class="gameTextInputs">
+            <label for="whichCard">Welche Karte(Index 1 -> 5): </label>
+            <input class="gameInput" type="text" id="whichCard">
+            <br>
+            <label for="whereCard">Wohin(Index 1 -> 5): </label>
+            <input class="gameInput" type="text" id="whereCard">
         </div>
     </div>
 }

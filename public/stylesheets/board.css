@@ -1,0 +1,80 @@
+* {
+    background-color: white;
+    color:black;
+    font-family: Tahoma, Arial, sans-serif;
+}
+
+p {
+    background-color: #008040;
+}
+
+.header {
+    height: 100px;
+    padding: 10px
+    margin: 10px;
+    border-width: 10px;
+    border-style: solid;
+
+}
+
+.player {
+    margin: 10px;
+    float: right;
+}
+
+.playerIcon {
+    height: 60px;
+    width: 60px;
+}
+
+.board {
+    background-color: #008040;
+    padding: 10px;
+    width: 750px;
+    border-width: 8px;
+    border-style: solid;
+    border-color: #80471C;
+}
+
+.spielerStapel {
+    background-color: #008040;
+}
+
+.hand{
+    background-color: #008040;
+}
+
+.helpstacks {
+    background-color: #008040;
+}
+
+.ablageStapel {
+    background-color: #008040;
+}
+
+.gameButtonsDiv {
+    padding: 10px;
+}
+
+.gameButton {
+    background-color: #808080;
+    padding: 10px;
+    margin: 3px;
+    width: 325px;
+    height: 40px;
+}
+
+.gameTextInputs {
+    padding: 10px;
+}
+
+.gameInput {
+    background-color: white;
+}
+
+.gameState {
+    text-align: center;
+    font-size: 20px;
+    margin: 20px;
+}
+
