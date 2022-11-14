@@ -30,11 +30,15 @@ p {
 .board {
     background-color: #008040;
     padding: 10px;
-    width: 750px;
+    text-align: center;
     border-width: 8px;
     border-style: solid;
     border-color: #80471C;
 }
+
+.boardgap {
+    background-color: #008040;
+    }
 
 .spielerStapel {
     background-color: #008040;
