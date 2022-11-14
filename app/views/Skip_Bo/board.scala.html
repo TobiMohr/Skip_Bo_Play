@@ -122,10 +122,20 @@
         </center>
         <h2>Aktionen:</h2>
         <div class="gameButtonsDiv">
-            <button class="gameButton" id="hand_Ablagestapel" onclick="hand_Ablagestapel_click()">Karte von Hand auf Ablagestapel</button>
-            <button class="gameButton" id="hand_Hilfestapel" onclick="hand_Hilfestapel_click()">Karte von Hand auf Hilfsstapel</button>
-            <button class="gameButton" id="hilfestapel_Ablagestapel" onclick="hilfestapel_Ablagestapel_click()">Karte von Hilfestapel auf Ablagestapel</button>
-            <button class="gameButton" id="spielerstapel_Ablagestapel" onclick="spielerstapel_Ablagestapel_click()">Karte vom Spielerstapel auf Ablagestapel</button>
+            <div class="row">
+                <div class="col-xl-3">
+                    <button class="gameButton" id="hand_Ablagestapel" onclick="hand_Ablagestapel_click()">Karte von Hand auf Ablagestapel</button>
+                </div>
+                <div class="col-xl-3">
+                    <button class="gameButton" id="hand_Hilfestapel" onclick="hand_Hilfestapel_click()">Karte von Hand auf Hilfsstapel</button>
+                </div>
+                <div class="col-xl-3">
+                    <button class="gameButton" id="hilfestapel_Ablagestapel" onclick="hilfestapel_Ablagestapel_click()">Karte von Hilfestapel auf Ablagestapel</button>
+                </div>
+                <div class="col-xl-3">
+                    <button class="gameButton" id="spielerstapel_Ablagestapel" onclick="spielerstapel_Ablagestapel_click()">Karte vom Spielerstapel auf Ablagestapel</button>
+                </div>
+            </div>
         </div>
         <div class="gameTextInputs">
             <label for="whichCard">Welche Karte(Index 1 -> 5): </label>
