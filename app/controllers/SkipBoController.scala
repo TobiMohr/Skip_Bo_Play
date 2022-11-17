@@ -33,7 +33,7 @@ class SkipBoController @Inject()(cc: ControllerComponents) extends AbstractContr
   }
 
   def hilfestapel_Ablagestapel(whichCard: Int, whereCard: Int) = Action {
-    gameController.pushCardHelp(whereCard, whichCard, gameController.playerState.getPlayer);
+    gameController.pushCardHelp(whichCard, whereCard, gameController.playerState.getPlayer);
     Ok(views.html.Skip_Bo.board(gameController))
   }
 
