@@ -34,7 +34,7 @@
 
 @main("HTWG Skip Bo") {
 <header class="header">
-    <link rel="stylesheet" href='@routes.Assets.versioned("stylesheets/board.css")'/>
+    <link rel="stylesheet" href='@routes.Assets.versioned("stylesheets/board.css")' />
     @if(playerName == "A"){
     <div class="player">
         <img class="playerIcon" id="playerAIcon" src='@routes.Assets.versioned("images/PlayerA.png")'>
@@ -77,26 +77,26 @@
             <br><br>
             <div class="row">
                 <div class="boardgap col-2"></div>
-            <div class="hand col-8">
-                @if(controller.game.player.isEmpty){
-                <p>Handkarten: | 0 | | 0 | | 0 | | 0 | | 0 |</p>
-                } else {
-                @if(handSize == 5){
-                <p>Handkarten: | @firstHandCard | | @secondHandCard | | @thirdHandCard | | @fourthHandCard | |
-                    @fifthHandCard |</p>
-                } else if(handSize == 4){
-                <p>Handkarten: | @firstHandCard | | @secondHandCard | | @thirdHandCard | | @fourthHandCard |</p>
-                } else if(handSize == 3){
-                <p>Handkarten: | @firstHandCard | | @secondHandCard | | @thirdHandCard |</p>
-                } else if(handSize == 2){
-                <p>Handkarten: | @firstHandCard | | @secondHandCard |</p>
-                } else if(handSize == 1){
-                <p>Handkarten: | @firstHandCard |</p>
-                }
-                }
-            </div>
-                <div class="boardgap col-2"></div>
+                <div class="hand col-8">
+                    @if(controller.game.player.isEmpty){
+                    <p>Handkarten: | 0 | | 0 | | 0 | | 0 | | 0 |</p>
+                    } else {
+                    @if(handSize == 5){
+                    <p>Handkarten: | @firstHandCard | | @secondHandCard | | @thirdHandCard | | @fourthHandCard | |
+                        @fifthHandCard |</p>
+                    } else if(handSize == 4){
+                    <p>Handkarten: | @firstHandCard | | @secondHandCard | | @thirdHandCard | | @fourthHandCard |</p>
+                    } else if(handSize == 3){
+                    <p>Handkarten: | @firstHandCard | | @secondHandCard | | @thirdHandCard |</p>
+                    } else if(handSize == 2){
+                    <p>Handkarten: | @firstHandCard | | @secondHandCard |</p>
+                    } else if(handSize == 1){
+                    <p>Handkarten: | @firstHandCard |</p>
+                    }
+                    }
                 </div>
+                <div class="boardgap col-2"></div>
+            </div>
             <br><br>
             <div class="row">
                 <div class="boardgap col-2"></div>
@@ -147,22 +147,28 @@
     <div class="gameButtonsDiv">
         <div class="row">
             <div class="col-xl-3">
-                <button class="gameButton" id="hand_Ablagestapel" onclick="hand_Ablagestapel_click()">Karte von Hand auf
+                <button class="gameButton" id="hand_Ablagestapel"
+                    onclick="hand_Ablagestapel_click(document.getElementById('whichCard').value, document.getElementById('whereCard').value)">Karte
+                    von Hand auf
                     Ablagestapel
                 </button>
             </div>
             <div class="col-xl-3">
-                <button class="gameButton" id="hand_Hilfestapel" onclick="hand_Hilfestapel_click()">Karte von Hand auf
+                <button class="gameButton" id="hand_Hilfestapel"
+                    onclick="hand_Hilfestapel_click(document.getElementById('whichCard').value, document.getElementById('whereCard').value)">Karte
+                    von Hand auf
                     Hilfsstapel
                 </button>
             </div>
             <div class="col-xl-3">
-                <button class="gameButton" id="hilfestapel_Ablagestapel" onclick="hilfestapel_Ablagestapel_click()">
+                <button class="gameButton" id="hilfestapel_Ablagestapel"
+                    onclick="hilfestapel_Ablagestapel_click(document.getElementById('whichCard').value, document.getElementById('whereCard').value)">
                     Karte von Hilfestapel auf Ablagestapel
                 </button>
             </div>
             <div class="col-xl-3">
-                <button class="gameButton" id="spielerstapel_Ablagestapel" onclick="spielerstapel_Ablagestapel_click()">
+                <button class="gameButton" id="spielerstapel_Ablagestapel"
+                    onclick="spielerstapel_Ablagestapel_click(document.getElementById('whereCard').value)">
                     Karte vom Spielerstapel auf Ablagestapel
                 </button>
             </div>
@@ -178,25 +184,28 @@
 </div>
 }
 <script>
-    function hand_Ablagestapel_click()
-    {
-        val whichCard = document.getElementById("whichCard").value.toInt - 1;
-        val whereCard = document.getElementById("whereCard").value.toInt - 1;
-        controller.pushCardHand(whereCard, whichCard, controller.playerState.getPlayer, false);
+    function hand_Ablagestapel_click(whichCard, whereCard) {
+        console.log("erste Methode: " + whichCard + " | " + whereCard);
+        whichCardInt = parseInt(whichCard) - 1;
+        whereCardInt = parseInt(whereCard) - 1;
+        window.location.href = "/hand_Ablagestapel/" + whichCard + "/" + whereCard;
     }
-    function hand_Hilfestapel_click(){
-        val whichCard = document.getElementById("whichCard").value.toInt - 1;
-        val whereCard = document.getElementById("whereCard").value.toInt - 1;
-        controller.pushCardHand(whereCard, whichCard, controller.playerState.getPlayer, true);
+    function hand_Hilfestapel_click(whichCard, whereCard) {
+        console.log("zweite Methode: " + whichCard + " | " + whereCard);
+        whichCardInt = parseInt(whichCard) - 1;
+        whereCardInt = parseInt(whereCard) - 1;
+        window.location.href = "/hand_Hilfestapel/" + whichCard + "/" + whereCard;
     }
-    function hilfestapel_Ablagestapel_click(){
-        val whichCard = document.getElementById("whichCard").value.toInt - 1;
-        val whereCard = document.getElementById("whereCard").value.toInt - 1;
-        controller.pushCardHelp(whereCard, whichCard, controller.playerState.getPlayer);
+    function hilfestapel_Ablagestapel_click(whichCard, whereCard) {
+        console.log("dritte Methode: " + whichCard + " | " + whereCard);
+        whichCardInt = parseInt(whichCard) - 1;
+        whereCardInt = parseInt(whereCard) - 1;
+        window.location.href = "/hilfestapel_Ablagestapel/" + whichCard + "/" + whereCard;
     }
-    function spielerstapel_Ablagestapel_click(){
-        val whereCard = document.getElementbyId("whereCard").value.toInt - 1;
-        controller.pushCardPlayer(whereCard, controller.palyerState.getPlayer);
+    function spielerstapel_Ablagestapel_click(whereCard) {
+        console.log("Hallo " + whereCard);
+        card = parseInt(whereCard) - 1;
+        window.location.href = "/spielerstapel_Ablagestapel/" + whereCard;
     }
 
 

@@ -22,6 +22,26 @@ class SkipBoController @Inject()(cc: ControllerComponents) extends AbstractContr
     Ok(views.html.Skip_Bo.board(gameController))
   }
 
+  def hand_Ablagestapel(whichCard: Int, whereCard: Int) = Action {
+    gameController.pushCardHand(whereCard, whichCard, gameController.playerState.getPlayer, true);
+    Ok(views.html.Skip_Bo.board(gameController))
+  }
+
+  def hand_Hilfestapel(whichCard: Int, whereCard: Int) = Action {
+    gameController.pushCardHand(whereCard, whichCard, gameController.playerState.getPlayer, true);
+    Ok(views.html.Skip_Bo.board(gameController))
+  }
+
+  def hilfestapel_Ablagestapel(whichCard: Int, whereCard: Int) = Action {
+    gameController.pushCardHelp(whereCard, whichCard, gameController.playerState.getPlayer);
+    Ok(views.html.Skip_Bo.board(gameController))
+  }
+
+  def spielerstapel_Ablagestapel(whereCard: Int) = Action {
+    gameController.pushCardPlayer(whereCard, gameController.playerState.getPlayer);
+    Ok(views.html.Skip_Bo.board(gameController))
+  }
+
   
 
 //---------------------------------------------------------------------------
