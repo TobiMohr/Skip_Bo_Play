@@ -3,6 +3,9 @@ package controllers
 import javax.inject._
 import play.api.mvc._
 import de.htwg.se.Skip_Bo.Skip_Bo
+import play.api.libs.json.{JsObject, JsValue, Json, Writes}
+
+import scala.language.postfixOps
 /**
  * This controller creates an `Action` to handle HTTP requests to the
  * application's home page.
@@ -52,4 +55,78 @@ class SkipBoController @Inject()(cc: ControllerComponents) extends AbstractContr
   def skipBo = Action {
     Ok(views.html.index())
   }
+
+  def status = Action{
+    Ok(Json.obj(
+      "PlayerA Hand" -> playerHand(0),
+      "PlayerA Spielerstapel" -> playerSpielerStapel(0),
+      "PlayerA Helpstacks" -> playerHelpstacks(0),
+      "PlayerB Hand" -> playerHand(1),
+      "PlayerB Spielerstapel" -> playerSpielerStapel(1),
+      "PlayerB HelpStacks" -> playerHelpstacks(1),
+      "Ablagestapel" -> ablageStapel(),
+      "Current Player" -> currentPlayer(),
+      "Gamestate" -> gameController.gameState,
+      "Statusmessage" -> gameController.statusText
+    ))
+  }
+
+  def playerHand(player: Int): JsValue = Json.toJson(
+      for {
+        handSize <- gameController.game.player(player).cards.indices
+      } yield {
+        val position = handSize + 1
+        Json.obj(
+          "Cardnumber" -> position,
+          "Cardvalue" -> Json.toJson(gameController.game.player(player).cards(handSize).toString())
+        )
+      }
+  )
+
+  def playerSpielerStapel(player: Int): JsValue = Json.toJson(
+    Json.obj(
+      "Size" -> gameController.game.player(player).stack.size,
+      "Top Card" -> gameController.game.player(player).stack.head.toString()
+    )
+  )
+
+  def playerHelpstacks(player: Int): JsValue = Json.toJson(
+    for {
+      helpstack <- gameController.game.player(player).helpstack.indices
+    } yield {
+      val helpstack_number = helpstack + 1
+      Json.obj(
+        "HelpStack Number" -> helpstack_number,
+        "HelpStack Size" -> gameController.game.player(player).helpstack(helpstack).size,
+        "HelpStack Cards" -> helpStackCards(player, helpstack)
+      )
+    }
+  )
+
+  def ablageStapel(): JsValue = Json.toJson(
+    for {
+      stack <- gameController.game.stack.indices
+    } yield {
+      val stack_number = stack + 1
+      Json.obj(
+        "Stacknumber" -> stack_number,
+        "Number of Cards" -> gameController.game.stack(stack).size
+      )
+    }
+  )
+
+  def currentPlayer() = "Its Player " + gameController.playerState.name.toString + "'s turn right now."
+
+
+  def helpStackCards(player: Int, helpstack: Int): JsValue = Json.toJson(
+    for {
+      card <- gameController.game.player(player).helpstack(helpstack).indices
+    } yield {
+      val postion = card + 1
+      Json.obj(
+        "Cardposition" -> postion,
+        "Cardvalue" -> gameController.game.player(player).helpstack(helpstack)(card).toString()
+      )
+    }
+  )
 }
