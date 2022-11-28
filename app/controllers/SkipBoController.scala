@@ -56,18 +56,21 @@ class SkipBoController @Inject()(cc: ControllerComponents) extends AbstractContr
     Ok(views.html.index())
   }
 
+
+
+//---------------------------------------------------------------------------------------------
   def status = Action{
     Ok(Json.obj(
-      "PlayerA Hand" -> playerHand(0),
-      "PlayerA Spielerstapel" -> playerSpielerStapel(0),
-      "PlayerA Helpstacks" -> playerHelpstacks(0),
-      "PlayerB Hand" -> playerHand(1),
-      "PlayerB Spielerstapel" -> playerSpielerStapel(1),
-      "PlayerB HelpStacks" -> playerHelpstacks(1),
-      "Ablagestapel" -> ablageStapel(),
-      "Current Player" -> currentPlayer(),
-      "Gamestate" -> gameController.gameState,
-      "Statusmessage" -> gameController.statusText
+      "playerA_Hand" -> playerHand(0),
+      "playerA_Spielerstapel" -> playerSpielerStapel(0),
+      "playerA_Helpstacks" -> playerHelpstacks(0),
+      "playerB_Hand" -> playerHand(1),
+      "playerB_Spielerstapel" -> playerSpielerStapel(1),
+      "playerB_HelpStacks" -> playerHelpstacks(1),
+      "ablagestapel" -> ablageStapel(),
+      "current_Player" -> currentPlayer(),
+      "gamestate" -> gameController.gameState,
+      "statusmessage" -> gameController.statusText
     ))
   }
 
@@ -129,4 +132,46 @@ class SkipBoController @Inject()(cc: ControllerComponents) extends AbstractContr
       )
     }
   )
+
+//----------------------------------------------------------------------------------------------------------------------
+    def processCommand(cmd: String, data: String): String = {
+    if (cmd.equals("\"board\"")) {
+      board
+    } else if (cmd.equals("\"hand_Ablagestapel\"")) {
+      println(data)
+      //hand_Ablagestapel
+    } else if (cmd.equals("\"hand_Hilfestapel\"")) {
+      //hand_Hilfestapel
+    } else if (cmd.equals("\"hilfestapel_Ablagestapel\"")) {
+      //hilfestapel_Ablagestapel
+    } else if (cmd.equals("\"spielerstapel_Ablagestapel\"")) {
+      //spielerstapel_Ablagestapel(data.replace("\"", ""))
+    }
+    "Ok"
+  }
+
+  def badRequest(errorMessage: String) = BadRequest(errorMessage + "\nPlease return to the last site")
+
+  def processRequest = Action {
+    implicit request => {
+      val req = request.body.asJson
+      val result = processCommand(req.get("cmd").toString(), req.get("data").toString())
+      if (result.contains("Error")) {
+        BadRequest(result)
+      } else {
+        Ok(Json.obj(
+      "playerA_Hand" -> playerHand(0),
+      "playerA_Spielerstapel" -> playerSpielerStapel(0),
+      "playerA_Helpstacks" -> playerHelpstacks(0),
+      "playerB_Hand" -> playerHand(1),
+      "playerB_Spielerstapel" -> playerSpielerStapel(1),
+      "playerB_HelpStacks" -> playerHelpstacks(1),
+      "ablagestapel" -> ablageStapel(),
+      "current_Player" -> currentPlayer(),
+      "gamestate" -> gameController.gameState,
+      "statusmessage" -> gameController.statusText
+    ))
+      }
+    }
+  }
 }

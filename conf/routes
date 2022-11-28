@@ -12,6 +12,8 @@ GET     /rules                      controllers.SkipBoController.rules()
 
 GET     /board                      controllers.SkipBoController.board()
 
+POST    /command                    controllers.SkipBoController.processRequest
+
 GET     /status                     controllers.SkipBoController.status()
 
 GET     /hand_Ablagestapel/:whichCard/:whereCard          controllers.SkipBoController.hand_Ablagestapel(whichCard: Int, whereCard: Int)
