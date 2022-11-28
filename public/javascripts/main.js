@@ -53,13 +53,16 @@ function processCommand(cmd, data, data2) {
 }
 
 function updateGameBoard() {
-    let playerA_Hand = data.playerA_Hand;
-    let playerA_SpielerStapel = data.playerA_SpielerStapel;
-    let playerA_HelpStack = data.playerA_HelpStack;
-    let playerB_Hand = data.playerB_Hand;
-    let playerB_SpielerStapel = data.playerB_SpielerStapel;
-    let playerB_HelpStack = data.playerB_HelpStack;
-    let ablageStapel = data.ablageStapel;
+    //let playerA_Hand = data.playerA_Hand;
+    // let playerA_SpielerStapel = data.playerA_SpielerStapel;
+    // let playerA_HelpStack = data.playerA_HelpStack;
+    //let playerB_Hand = data.playerB_Hand;
+    //let playerB_SpielerStapel = data.playerB_SpielerStapel;
+    //let playerB_HelpStack = data.playerB_HelpStack;
+    let ablageStapel1 = data.ablageStapel_0;
+    let ablageStapel2 = data.ablageStapel_1;
+    let ablageStapel3 = data.ablageStapel_2;
+    let ablageStapel4 = data.ablageStapel_3;
     let current_Player = data.current_Player;
     let gameState = data.gamestate;
     let statusmessage = data.statusmessage;
@@ -68,8 +71,7 @@ function updateGameBoard() {
     $('#TestLabel').empty();
     $('#TestLabel').append(current_Player);
 
-    //$('#' + current_Player).text(current_Player);
-    console.log($('#' + "TestLabel").text());
+    const parent = $('#AblageStapelID').get(0);
 
 }
 
@@ -80,9 +82,7 @@ function updateInputPanel() {
 
 let sHandToAblage = "<div class=\"col-xl-3\">\n" +
     "   <button class=\"gameButton\" id=\"hand_Ablagestapel\">\n" +
-    "Karte " +
-    "von Hand auf " +
-    "Ablagestapel" +
+    "Karte von Hand auf Ablagestapel" +
     "</button> \n" +
     "</div> \n"
 
@@ -91,23 +91,19 @@ let sHandToHilfe = "<div class=\"col-xl-3\">\n" +
     "   <button class=\"gameButton\" id=\"hand_Hilfestapel\">\n" +
     "Karte " +
     "von Hand auf " +
-    "Ablagestapel" +
+    "Hilfstapel" +
     "</button> \n" +
     "</div> \n"
 
 let sHilfeToAblage = "<div class=\"col-xl-3\">\n" +
     "   <button class=\"gameButton\" id=\"hilfestapel_Ablagestapel\">\n" +
-    "Karte " +
-    "von Hand auf " +
-    "Ablagestapel" +
+    "Karte von Hilfestapel auf Ablagestapel" +
     "</button> \n" +
     "</div> \n"
 
 let sSpielerToAblage = "<div class=\"col-xl-3\">\n" +
     "   <button class=\"gameButton\" id=\"spielerstapel_Ablagestapel\"> " +
-    "Karte " +
-    "von Hand auf " +
-    "Ablagestapel" +
+    "Karte vom Spielerstapel auf Ablagestapel" +
     "</button> \n" +
     "</div> \n"
 

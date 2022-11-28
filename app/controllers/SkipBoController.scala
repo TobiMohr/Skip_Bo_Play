@@ -63,83 +63,55 @@ class SkipBoController @Inject()(cc: ControllerComponents) extends AbstractContr
 //---------------------------------------------------------------------------------------------
   def status = Action{
     Ok(Json.obj(
-      "playerA_Hand" -> playerHand(0),
-      "playerA_Spielerstapel" -> playerSpielerStapel(0),
-      "playerA_Helpstacks" -> playerHelpstacks(0),
-      "playerB_Hand" -> playerHand(1),
-      "playerB_Spielerstapel" -> playerSpielerStapel(1),
-      "playerB_HelpStacks" -> playerHelpstacks(1),
-      "ablagestapel" -> ablageStapel(),
+      "playerA_Hand_0" -> playerHand(0, 0),
+      "playerA_Hand_1" -> playerHand(0, 1),
+      "playerA_Hand_2" -> playerHand(0, 2),
+      "playerA_Hand_3" -> playerHand(0, 3),
+      "playerA_Hand_4" -> playerHand(0, 4),
+      "playerA_Spielerstapel_Value" -> playerSpielerStapel(0),
+      "playerA_Spielerstapel_Size" -> playerSpielerStapelSize(0),
+      "playerA_HelpStacks_0" -> playerHelpStacks(0,0),
+      "playerA_HelpStacks_1" -> playerHelpStacks(0,1),
+      "playerA_HelpStacks_2" -> playerHelpStacks(0,2),
+      "playerA_HelpStacks_3" -> playerHelpStacks(0,3),
+      "playerB_Hand_0" -> playerHand(1, 0),
+      "playerB_Hand_1" -> playerHand(1, 1),
+      "playerB_Hand_2" -> playerHand(1, 2),
+      "playerB_Hand_3" -> playerHand(1, 3),
+      "playerB_Hand_4" -> playerHand(1, 4),
+      "playerB_Spielerstapel_Value" -> playerSpielerStapel(1),
+      "playerB_Spielerstapel_Size" -> playerSpielerStapelSize(1),
+      "playerB_HelpStacks_0" -> playerHelpStacks(1,0),
+      "playerB_HelpStacks_1" -> playerHelpStacks(1,1),
+      "playerB_HelpStacks_2" -> playerHelpStacks(1,2),
+      "playerB_HelpStacks_3" -> playerHelpStacks(1,3),
+      "ablagestapel_0" -> ablageStapel(0),
+      "ablagestapel_1" -> ablageStapel(1),
+      "ablagestapel_2" -> ablageStapel(2),
+      "ablagestapel_3" -> ablageStapel(3),
       "current_Player" -> currentPlayer(),
       "gamestate" -> gameController.gameState,
       "statusmessage" -> gameController.statusText
     ))
   }
 
-  def playerHand(player: Int): JsValue = Json.toJson(
-      for {
-        handSize <- gameController.game.player(player).cards.indices
-      } yield {
-        val position = handSize + 1
-        Json.obj(
-          "Cardnumber" -> position,
-          "Cardvalue" -> Json.toJson(gameController.game.player(player).cards(handSize).toString())
-        )
-      }
-  )
+  def playerHand(player: Int, whichCard: Int) = gameController.game.player(player).cards(whichCard).toString()
 
-  def playerSpielerStapel(player: Int): JsValue = Json.toJson(
-    Json.obj(
-      "Size" -> gameController.game.player(player).stack.size,
-      "Top Card" -> gameController.game.player(player).stack.head.toString()
-    )
-  )
+  def playerSpielerStapel(player: Int) = gameController.game.player(player).stack.head.toString()
 
-  def playerHelpstacks(player: Int): JsValue = Json.toJson(
-    for {
-      helpstack <- gameController.game.player(player).helpstack.indices
-    } yield {
-      val helpstack_number = helpstack + 1
-      Json.obj(
-        "HelpStack Number" -> helpstack_number,
-        "HelpStack Size" -> gameController.game.player(player).helpstack(helpstack).size,
-        "HelpStack Cards" -> helpStackCards(player, helpstack)
-      )
+  def playerSpielerStapelSize(player: Int) = gameController.game.player(player).stack.size.toString()
+
+  def playerHelpStacks(player: Int, value: Int) = {
+    if (gameController.game.player(player).helpstack(value).isEmpty) {
+      ""
+    } else {
+      gameController.game.player(player).helpstack(value).head.toString()
     }
-  )
+  }
 
-  def ablageStapel(): JsValue = Json.toJson(
-    for {
-      stack <- gameController.game.stack.indices
-    } yield {
-      val stack_number = stack + 1
-      Json.obj(
-        "Stacknumber" -> stack_number,
-        "Number of Cards" -> gameController.game.stack(stack).size
-      )
-    }
-  )
+  def ablageStapel(whichStack: Int) = gameController.game.stack(whichStack).size.toString();
 
   def currentPlayer() = "Player " + gameController.playerState.name.toString 
-
-
-  def helpStackCards(player: Int, helpstack: Int): JsValue = Json.toJson(
-    for {
-      card <- gameController.game.player(player).helpstack(helpstack).indices
-    } yield {
-      val postion = card + 1
-      Json.obj(
-        "Cardposition" -> postion,
-        "Cardvalue" -> gameController.game.player(player).helpstack(helpstack)(card).toString()
-      )
-    }
-  )
-
-
-    def testFunction() = Action {
-      Console.printf("Du wichser")
-      Ok(skipBoAsText)
-    }
 
 //----------------------------------------------------------------------------------------------------------------------
   def processCommand(cmd: String, data1: String, data2: String): String = {
@@ -186,13 +158,32 @@ class SkipBoController @Inject()(cc: ControllerComponents) extends AbstractContr
         BadRequest(result)
       } else {
         Ok(Json.obj(
-      "playerA_Hand" -> playerHand(0),
-      "playerA_Spielerstapel" -> playerSpielerStapel(0),
-      "playerA_Helpstacks" -> playerHelpstacks(0),
-      "playerB_Hand" -> playerHand(1),
-      "playerB_Spielerstapel" -> playerSpielerStapel(1),
-      "playerB_HelpStacks" -> playerHelpstacks(1),
-      "ablagestapel" -> ablageStapel(),
+      "playerA_Hand_0" -> playerHand(0, 0),
+      "playerA_Hand_1" -> playerHand(0, 1),
+      "playerA_Hand_2" -> playerHand(0, 2),
+      "playerA_Hand_3" -> playerHand(0, 3),
+      "playerA_Hand_4" -> playerHand(0, 4),
+      "playerA_Spielerstapel_Value" -> playerSpielerStapel(0),
+      "playerA_Spielerstapel_Size" -> playerSpielerStapelSize(0),
+      "playerA_HelpStacks_0" -> playerHelpStacks(0,0),
+      "playerA_HelpStacks_1" -> playerHelpStacks(0,1),
+      "playerA_HelpStacks_2" -> playerHelpStacks(0,2),
+      "playerA_HelpStacks_3" -> playerHelpStacks(0,3),
+      "playerB_Hand_0" -> playerHand(1, 0),
+      "playerB_Hand_1" -> playerHand(1, 1),
+      "playerB_Hand_2" -> playerHand(1, 2),
+      "playerB_Hand_3" -> playerHand(1, 3),
+      "playerB_Hand_4" -> playerHand(1, 4),
+      "playerB_Spielerstapel_Value" -> playerSpielerStapel(1),
+      "playerB_Spielerstapel_Size" -> playerSpielerStapelSize(1),
+      "playerB_HelpStacks_0" -> playerHelpStacks(1,0),
+      "playerB_HelpStacks_1" -> playerHelpStacks(1,1),
+      "playerB_HelpStacks_2" -> playerHelpStacks(1,2),
+      "playerB_HelpStacks_3" -> playerHelpStacks(1,3),
+      "ablagestapel_0" -> ablageStapel(0),
+      "ablagestapel_1" -> ablageStapel(1),
+      "ablagestapel_2" -> ablageStapel(2),
+      "ablagestapel_3" -> ablageStapel(3),
       "current_Player" -> currentPlayer(),
       "gamestate" -> gameController.gameState,
       "statusmessage" -> gameController.statusText
