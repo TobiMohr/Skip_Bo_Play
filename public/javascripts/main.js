@@ -53,12 +53,10 @@ function processCommand(cmd, data, data2) {
 }
 
 function updateGameBoard() {
-    //let playerA_Hand = data.playerA_Hand;
-    // let playerA_SpielerStapel = data.playerA_SpielerStapel;
-    // let playerA_HelpStack = data.playerA_HelpStack;
-    //let playerB_Hand = data.playerB_Hand;
-    //let playerB_SpielerStapel = data.playerB_SpielerStapel;
-    //let playerB_HelpStack = data.playerB_HelpStack;
+    let playerA_Spielerstapel_Value = data.playerA_Spielerstapel_Value;
+    let playerA_Spielerstapel_Size = data.playerA_Spielerstapel_Size;
+    let playerB_Spielerstapel_Value = data.playerB_Spielerstapel_Value;
+    let playerB_Spielerstapel_Size = data.playerB_Spielerstapel_Size;
     let ablageStapel1 = data.ablageStapel_0;
     let ablageStapel2 = data.ablageStapel_1;
     let ablageStapel3 = data.ablageStapel_2;
@@ -67,11 +65,24 @@ function updateGameBoard() {
     let gameState = data.gamestate;
     let statusmessage = data.statusmessage;
 
-    console.log(current_Player);
-    $('#TestLabel').empty();
-    $('#TestLabel').append(current_Player);
-
-    const parent = $('#AblageStapelID').get(0);
+    console.log(playerA_Spielerstapel_Value);
+    $('#playerLabel').empty();
+    $('#playerLabel').append(current_Player);
+    const playerStack =  $('#spielerStapel').get(0);
+    playerStack.innerHTML = "";
+    if (current_Player === "Player A"){
+        $('#playerIcon').attr("src", "/assets/images/playerA.png");
+        playerStack.innerHTML = playerStack.innerHTML + `<p>Spielerstapel: | ${playerA_Spielerstapel_Value} |
+                                                                                -
+                                                                                verbleibende Karten:
+                                                                                ${playerA_Spielerstapel_Size} </p>`;
+    } else if (current_Player === "Player B"){
+        $('#playerIcon').attr("src", "/assets/images/playerB.png");
+        playerStack.innerHTML = playerStack.innerHTML + `<p>Spielerstapel: | ${playerB_Spielerstapel_Value} |
+                                                                                        -
+                                                                                        verbleibende Karten:
+                                                                                        ${playerB_Spielerstapel_Size} </p>`;
+    }
 
 }
 

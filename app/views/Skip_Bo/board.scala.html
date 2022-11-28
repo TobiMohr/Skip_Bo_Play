@@ -37,37 +37,21 @@
     <link rel="stylesheet" href='@routes.Assets.versioned("stylesheets/board.css")' />
 
     <div class="player">
-        @if(playerName == "A"){
-        <img class="playerIcon" id="playerAIcon" src='@routes.Assets.versioned("images/PlayerA.png")'>
-        } else {
-        <img class="playerIcon" id="playerBIcon" src='@routes.Assets.versioned("images/PlayerB.png")'>
-        }
+        <img class="playerIcon" id="playerIcon">
         <br>
-        <label id="TestLabel"></label>
+        <label id="playerLabel"></label>
     </div>
 </header>
 <div class="gamecontainer">
     <div class="gameState">
-        <div>@statusText</div>
+        <div id="statusText">@statusText</div>
     </div>
     <div class="row">
         <div class="col-3"></div>
         <div class="board col-6">
             <div class="row">
                 <div class="boardgap col-2"></div>
-                <div class="spielerStapel col-8">
-                    @if(controller.game.player.isEmpty){
-                    <p>Spielerstapel: | leer | - verbleibende Karten: 0</p>
-                    } else {
-                    @if(!controller.game.player(controller.playerState.getPlayer).stack.isEmpty){
-                    <p>Spielerstapel: | @controller.game.player(controller.playerState.getPlayer).stack.head.toString |
-                        -
-                        verbleibende Karten:
-                        @controller.game.player(controller.playerState.getPlayer).stack.size.toString </p>
-                    } else {
-                    <p>Spielerstapel: | leer | - verbleibende Karten: 0</p>
-                    }
-                    }
+                <div class="spielerStapel col-8" id="spielerStapel">
                 </div>
                 <div class="boardgap col-2"></div>
             </div>
