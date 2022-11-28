@@ -35,19 +35,16 @@
 @main("HTWG Skip Bo") {
 <header class="header">
     <link rel="stylesheet" href='@routes.Assets.versioned("stylesheets/board.css")' />
-    @if(playerName == "A"){
+
     <div class="player">
+        @if(playerName == "A"){
         <img class="playerIcon" id="playerAIcon" src='@routes.Assets.versioned("images/PlayerA.png")'>
-        <br>
-        <label for="playerAIcon">Player A</label>
-    </div>
-    } else {
-    <div class="player">
+        } else {
         <img class="playerIcon" id="playerBIcon" src='@routes.Assets.versioned("images/PlayerB.png")'>
+        }
         <br>
-        <label for="playerBIcon">Player B</label>
+        <label id="TestLabel"></label>
     </div>
-    }
 </header>
 <div class="gamecontainer">
     <div class="gameState">

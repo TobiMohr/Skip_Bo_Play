@@ -1,6 +1,6 @@
 $(document).ready(function () {
     getData().then(() => {
-        //updateInputPanel();
+        updateInputPanel();
         updateGameBoard();
         refreshOnClickEvents();
     })
@@ -22,6 +22,7 @@ function getData() {
 
 
 function post(method, url, data) {
+    console.log(data);
     return $.ajax({
         method: method,
         url: url,
@@ -31,20 +32,22 @@ function post(method, url, data) {
 
         success: function (response) {
             data = response;
+            console.log(data);
         },
         error: function (response) {
-            console.log("Error")
+            console.log("Error");
             console.error(response);
         }
     });
 }
 
-function processCommand(cmd, data) {
-    post("POST", "/command", { "cmd": cmd, "data": data }).then(() => {
+function processCommand(cmd, data, data2) {
+    console.log("CMD: " + cmd + " data1: " + data + " data2: " + data2);
+    post("POST", "/command", { "cmd": cmd, "data1": data, "data2": data2 }).then(() => {
         getData().then(() => {
             updateInputPanel();
             updateGameBoard();
-            refreshOnClickEvents()
+            refreshOnClickEvents();
         })
     })
 }
@@ -60,6 +63,14 @@ function updateGameBoard() {
     let current_Player = data.current_Player;
     let gameState = data.gamestate;
     let statusmessage = data.statusmessage;
+
+    console.log(current_Player);
+    $('#TestLabel').empty();
+    $('#TestLabel').append(current_Player);
+
+    //$('#' + current_Player).text(current_Player);
+    console.log($('#' + "TestLabel").text());
+
 }
 
 function updateInputPanel() {
@@ -117,51 +128,32 @@ function refreshOnClickEvents() {
 }
 
 function hand_Ablagestapel_click() {
-    /*
-    console.log("erste Methode: " + whichCard + " | " + whereCard);
-    whichCardInt = parseInt(whichCard) - 1;
-    whereCardInt = parseInt(whereCard) - 1;
-    window.location.href = "/hand_Ablagestapel/" + whichCardInt + "/" + whereCardInt;
-    */
-    whichCard = $.getElementById('whichCard').value;
-    whichCardToInt = parseInt(whichCard);
-    whereCard = $.getElementById('whereCard').value;
-    whereCardToInt = parseInt(whereCard);
-    processCommand("hand_Ablagestapel", new Array(whichCardInt, whereCardToInt));
+    let whichCard = $('#whichCard').val();
+    let whichCardToInt = parseInt(whichCard);
+    let whereCard = $('#whereCard').val();
+    let whereCardToInt = parseInt(whereCard);
+    console.log(whereCard + " " + whichCard);
+    processCommand("hand_Ablagestapel", whichCardToInt, whereCardToInt);
 }
 function hand_Hilfestapel_click() {
-    /*
-    console.log("zweite Methode: " + whichCard + " | " + whereCard);
-    whichCardInt = (parseInt($.getElementById('whichCard').value)) - 1;
-    whereCardInt = (parseInt($.getElementById('whereCard').value)) - 1;
-    window.location.href = "/hand_Hilfestapel/" + whichCardInt + "/" + whereCardInt;
-    */
-    whichCard = $.getElementById('whichCard').value;
-    whichCardToInt = parseInt(whichCard);
-    whereCard = $.getElementById('whereCard').value;
-    whereCardToInt = parseInt(whereCard);
-    processCommand("hand_Hilfestapel", new Array(whichCardInt, whereCardToInt));
+    let whichCard = $('#whichCard').val();
+    let whichCardToInt = parseInt(whichCard);
+    let whereCard = $('#whereCard').val();
+    console.log(whereCard + " " + whichCard);
+    let whereCardToInt = parseInt(whereCard);
+    processCommand("hand_Hilfestapel", whichCardToInt, whereCardToInt);
 }
 function hilfestapel_Ablagestapel_click() {
-    /*
-    console.log("dritte Methode:");
-    whichCardInt = (parseInt($.getElementById('whichCard').value)) - 1;
-    whereCardInt = (parseInt($.getElementById('whereCard').value)) - 1;
-    window.location.href = "/hilfestapel_Ablagestapel/" + whichCardInt + "/" + whereCardInt;
-    */
-    whichCard = $.getElementById('whichCard').value;
-    whichCardToInt = parseInt(whichCard);
-    whereCard = $.getElementById('whereCard').value;
-    whereCardToInt = parseInt(whereCard);
-    processCommand("hilfestapel_Ablagestapel", new Array(whichCardInt, whereCardToInt));
+    let whichCard = $('#whichCard').val();
+    let whichCardToInt = parseInt(whichCard);
+    let whereCard = $('#whereCard').val();
+    let whereCardToInt = parseInt(whereCard);
+    console.log(whereCard + " " + whichCard);
+    processCommand("hilfestapel_Ablagestapel", whichCardToInt, whereCardToInt);
 }
 function spielerstapel_Ablagestapel_click(whereCard) {
-    /*
-    console.log("Hallo " + whereCard);
-    card = parseInt(whereCard) - 1;
-    window.location.href = "/spielerstapel_Ablagestapel/" + card;
-    */
-    whereCard = $.getElementById('whereCard').value;
+    whereCard = $('#whereCard').val();
     whereCardToInt = parseInt(whereCard);
-    processCommand("spielerstapel_Ablagestapel", whereCardToInt);
+    console.log(whereCard + " " + whichCard);
+    processCommand("spielerstapel_Ablagestapel", whereCardToInt, "");
 }

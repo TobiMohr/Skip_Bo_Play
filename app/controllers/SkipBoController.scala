@@ -25,24 +25,26 @@ class SkipBoController @Inject()(cc: ControllerComponents) extends AbstractContr
     Ok(views.html.Skip_Bo.board(gameController))
   }
 
-  def hand_Ablagestapel(whichCard: Int, whereCard: Int) = Action {
+  def hand_Ablagestapel(whichCard: Int, whereCard: Int) = {
     gameController.pushCardHand(whereCard, whichCard, gameController.playerState.getPlayer, false);
-    Ok(views.html.Skip_Bo.board(gameController))
+    //Ok(views.html.Skip_Bo.board(gameController))
   }
 
-  def hand_Hilfestapel(whichCard: Int, whereCard: Int) = Action {
+  def hand_Hilfestapel(whichCard: Int, whereCard: Int) =  {
+    Console.printf("du hurensohn")
+    Console.printf(whichCard.toString, whereCard.toString)
     gameController.pushCardHand(whereCard, whichCard, gameController.playerState.getPlayer, true);
-    Ok(views.html.Skip_Bo.board(gameController))
+    //Ok(views.html.Skip_Bo.board(gameController))
   }
 
-  def hilfestapel_Ablagestapel(whichCard: Int, whereCard: Int) = Action {
+  def hilfestapel_Ablagestapel(whichCard: Int, whereCard: Int) = {
     gameController.pushCardHelp(whichCard, whereCard, gameController.playerState.getPlayer);
-    Ok(views.html.Skip_Bo.board(gameController))
+    //Ok(views.html.Skip_Bo.board(gameController))
   }
 
-  def spielerstapel_Ablagestapel(whereCard: Int) = Action {
+  def spielerstapel_Ablagestapel(whereCard: Int) = {
     gameController.pushCardPlayer(whereCard, gameController.playerState.getPlayer);
-    Ok(views.html.Skip_Bo.board(gameController))
+    //Ok(views.html.Skip_Bo.board(gameController))
   }
 
   
@@ -118,7 +120,7 @@ class SkipBoController @Inject()(cc: ControllerComponents) extends AbstractContr
     }
   )
 
-  def currentPlayer() = "Its Player " + gameController.playerState.name.toString + "'s turn right now."
+  def currentPlayer() = "Player " + gameController.playerState.name.toString 
 
 
   def helpStackCards(player: Int, helpstack: Int): JsValue = Json.toJson(
@@ -133,19 +135,43 @@ class SkipBoController @Inject()(cc: ControllerComponents) extends AbstractContr
     }
   )
 
+
+    def testFunction() = Action {
+      Console.printf("Du wichser")
+      Ok(skipBoAsText)
+    }
+
 //----------------------------------------------------------------------------------------------------------------------
-    def processCommand(cmd: String, data: String): String = {
-    if (cmd.equals("\"board\"")) {
-      board
-    } else if (cmd.equals("\"hand_Ablagestapel\"")) {
-      println(data)
-      //hand_Ablagestapel
-    } else if (cmd.equals("\"hand_Hilfestapel\"")) {
-      //hand_Hilfestapel
-    } else if (cmd.equals("\"hilfestapel_Ablagestapel\"")) {
-      //hilfestapel_Ablagestapel
-    } else if (cmd.equals("\"spielerstapel_Ablagestapel\"")) {
-      //spielerstapel_Ablagestapel(data.replace("\"", ""))
+  def processCommand(cmd: String, data1: String, data2: String): String = {
+
+      Console.printf(cmd)
+      var test = cmd.substring(1, cmd.length() - 1)
+      Console.printf(test)
+
+    if (test.equals("hand_Ablagestapel")) {
+
+      var whichCard = (data1.toInt) - 1
+      var whereCard = (data2.toInt) - 1
+      this.hand_Ablagestapel(whichCard, whereCard)
+
+    } else if (test.equals("hand_Hilfestapel")) {
+      Console.printf(data1 + " ")
+      Console.printf(data2)
+      var whichCard = (data1.toInt) - 1
+      var whereCard = (data2.toInt) - 1
+      this.hand_Hilfestapel(whichCard, whereCard)
+
+    } else if (test.equals("hilfestapel_Ablagestapel")) {
+
+      var whichCard = (data1.toInt) - 1
+      var whereCard = (data2.toInt) - 1
+      this.hilfestapel_Ablagestapel(whichCard, whereCard)
+
+    } else if (test.equals("spielerstapel_Ablagestapel")) {
+
+      var whereCard = (data1.toInt) - 1
+      this.spielerstapel_Ablagestapel(whereCard)
+
     }
     "Ok"
   }
@@ -155,7 +181,7 @@ class SkipBoController @Inject()(cc: ControllerComponents) extends AbstractContr
   def processRequest = Action {
     implicit request => {
       val req = request.body.asJson
-      val result = processCommand(req.get("cmd").toString(), req.get("data").toString())
+      val result = processCommand(req.get("cmd").toString(), req.get("data1").toString(), req.get("data2").toString())
       if (result.contains("Error")) {
         BadRequest(result)
       } else {
