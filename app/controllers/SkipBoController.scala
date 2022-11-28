@@ -27,27 +27,21 @@ class SkipBoController @Inject()(cc: ControllerComponents) extends AbstractContr
 
   def hand_Ablagestapel(whichCard: Int, whereCard: Int) = {
     gameController.pushCardHand(whereCard, whichCard, gameController.playerState.getPlayer, false);
-    //Ok(views.html.Skip_Bo.board(gameController))
   }
 
   def hand_Hilfestapel(whichCard: Int, whereCard: Int) =  {
-    Console.printf("du hurensohn")
+
     Console.printf(whichCard.toString, whereCard.toString)
     gameController.pushCardHand(whereCard, whichCard, gameController.playerState.getPlayer, true);
-    //Ok(views.html.Skip_Bo.board(gameController))
   }
 
   def hilfestapel_Ablagestapel(whichCard: Int, whereCard: Int) = {
     gameController.pushCardHelp(whichCard, whereCard, gameController.playerState.getPlayer);
-    //Ok(views.html.Skip_Bo.board(gameController))
   }
 
   def spielerstapel_Ablagestapel(whereCard: Int) = {
     gameController.pushCardPlayer(whereCard, gameController.playerState.getPlayer);
-    //Ok(views.html.Skip_Bo.board(gameController))
   }
-
-  
 
 //---------------------------------------------------------------------------
   def about = Action {
@@ -57,8 +51,6 @@ class SkipBoController @Inject()(cc: ControllerComponents) extends AbstractContr
   def skipBo = Action {
     Ok(views.html.index())
   }
-
-
 
 //---------------------------------------------------------------------------------------------
   def status = Action{
@@ -109,7 +101,13 @@ class SkipBoController @Inject()(cc: ControllerComponents) extends AbstractContr
     }
   }
 
-  def ablageStapel(whichStack: Int) = gameController.game.stack(whichStack).size.toString();
+  def ablageStapel(whichStack: Int) = {
+    if (gameController.game.stack(whichStack).isEmpty) {
+      "0"
+    } else {
+      gameController.game.stack(whichStack).size.toString()
+    }
+  };
 
   def currentPlayer() = "Player " + gameController.playerState.name.toString 
 

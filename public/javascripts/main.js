@@ -68,21 +68,120 @@ function updateGameBoard() {
     console.log(playerA_Spielerstapel_Value);
     $('#playerLabel').empty();
     $('#playerLabel').append(current_Player);
-    const playerStack =  $('#spielerStapel').get(0);
+
+    $('#statusText').empty();
+    $('#statusText').append(statusmessage);
+
+    const playerStack = $('#spielerStapel').get(0);
     playerStack.innerHTML = "";
-    if (current_Player === "Player A"){
+    if (current_Player === "Player A") {
         $('#playerIcon').attr("src", "/assets/images/playerA.png");
         playerStack.innerHTML = playerStack.innerHTML + `<p>Spielerstapel: | ${playerA_Spielerstapel_Value} |
                                                                                 -
                                                                                 verbleibende Karten:
                                                                                 ${playerA_Spielerstapel_Size} </p>`;
-    } else if (current_Player === "Player B"){
+    } else if (current_Player === "Player B") {
         $('#playerIcon').attr("src", "/assets/images/playerB.png");
         playerStack.innerHTML = playerStack.innerHTML + `<p>Spielerstapel: | ${playerB_Spielerstapel_Value} |
                                                                                         -
                                                                                         verbleibende Karten:
                                                                                         ${playerB_Spielerstapel_Size} </p>`;
     }
+
+    const parenHandKartenStack = $('#HandKartenID').get(0);
+    parenHandKartenStack.innerHTML = "<p> Handkarten: ";
+    if (current_Player === "Player A") {
+        if (data.playerA_Hand_0 === "" && data.playerA_Hand_1 === "" && data.playerA_Hand_2 === "" && data.playerA_Hand_3 === "" && data.playerA_Hand_4 === "") {
+            parenHandKartenStack.innerHTML += "| 0 | | 0 | | 0 | | 0 | | 0 |";
+        } else {
+            if (data.playerA_Hand_0 !== "") {
+                parenHandKartenStack.innerHTML += "| " + data.playerA_Hand_0 + " | ";
+            }
+            if (data.playerA_Hand_1 !== "") {
+                parenHandKartenStack.innerHTML += "| " + data.playerA_Hand_1 + " | ";
+            }
+            if (data.playerA_Hand_2 !== "") {
+                parenHandKartenStack.innerHTML += "| " + data.playerA_Hand_2 + " | ";
+            }
+            if (data.playerA_Hand_3 !== "") {
+                parenHandKartenStack.innerHTML += "| " + data.playerA_Hand_3 + " | ";
+            }
+            if (data.playerA_Hand_4 !== "") {
+                parenHandKartenStack.innerHTML += "| " + data.playerA_Hand_4 + " | ";
+            }
+            parenHandKartenStack.innerHTML += "</p>";
+        }
+    } else {
+        if (data.playerB_Hand_0 === "" && data.playerB_Hand_1 === "" && data.playerB_Hand_2 === "" && data.playerB_Hand_3 === "" && data.playerB_Hand_4 === "") {
+            parenHandKartenStack.innerHTML += "| 0 | | 0 | | 0 | | 0 | | 0 |";
+        } else {
+            if (data.playerB_Hand_0 !== "") {
+                parenHandKartenStack.innerHTML += "| " + data.playerB_Hand_0 + " | ";
+            }
+            if (data.playerB_Hand_1 !== "") {
+                parenHandKartenStack.innerHTML += "| " + data.playerB_Hand_1 + " | ";
+            }
+            if (data.playerB_Hand_2 !== "") {
+                parenHandKartenStack.innerHTML += "| " + data.playerB_Hand_2 + " | ";
+            }
+            if (data.playerB_Hand_3 !== "") {
+                parenHandKartenStack.innerHTML += "| " + data.playerB_Hand_3 + " | ";
+            }
+            if (data.playerB_Hand_4 !== "") {
+                parenHandKartenStack.innerHTML += "| " + data.playerB_Hand_4 + " | ";
+            }
+            parenHandKartenStack.innerHTML += "</p>";
+        }
+    }
+
+    const parentHelpStack = $('#helpStackID').get(0);
+    parentHelpStack.innerHTML = "<p>Hilfestapel:</p>";
+    if (current_Player === "Player A") {
+        if (data.playerA_HelpStacks_0 === "") {
+            parentHelpStack.innerHTML += "<p>| leer |</p>";
+        } else {
+            parentHelpStack.innerHTML += "<p>|" + data.playerA_HelpStacks_0 + "|</p>"
+        }
+        if (data.playerA_HelpStacks_1 === "") {
+            parentHelpStack.innerHTML += "<p>| leer |</p>";
+        } else {
+            parentHelpStack.innerHTML += "<p>|" + data.playerA_HelpStacks_1 + "|</p>"
+        }
+        if (data.playerA_HelpStacks_2 === "") {
+            parentHelpStack.innerHTML += "<p>| leer |</p>";
+        } else {
+            parentHelpStack.innerHTML += "<p>|" + data.playerA_HelpStacks_2 + "|</p>"
+        }
+        if (data.playerA_HelpStacks_3 === "") {
+            parentHelpStack.innerHTML += "<p>| leer |</p>";
+        } else {
+            parentHelpStack.innerHTML += "<p>|" + data.playerA_HelpStacks_3 + "|</p>"
+        }
+    } else {
+        if (data.playerB_HelpStacks_0 === "") {
+            parentHelpStack.innerHTML += "<p>| leer |</p>";
+        } else {
+            parentHelpStack.innerHTML += "<p>|" + data.playerB_HelpStacks_0 + "|</p>"
+        }
+        if (data.playerB_HelpStacks_1 === "") {
+            parentHelpStack.innerHTML += "<p>| leer |</p>";
+        } else {
+            parentHelpStack.innerHTML += "<p>|" + data.playerB_HelpStacks_1 + "|</p>"
+        }
+        if (data.playerB_HelpStacks_2 === "") {
+            parentHelpStack.innerHTML += "<p>| leer |</p>";
+        } else {
+            parentHelpStack.innerHTML += "<p>|" + data.playerB_HelpStacks_2 + "|</p>"
+        }
+        if (data.playerB_HelpStacks_3 === "") {
+            parentHelpStack.innerHTML += "<p>| leer |</p>";
+        } else {
+            parentHelpStack.innerHTML += "<p>|" + data.playerB_HelpStacks_3 + "|</p>"
+        }
+    }
+
+    const parent = $('#AblageStapelID').get(0);
+    parent.innerHTML = "<p>AblageStapel: | " + data.ablagestapel_0 + " | " + data.ablagestapel_1 + " | " + data.ablagestapel_2 + " | " + data.ablagestapel_3 + " |</p>";
 
 }
 
