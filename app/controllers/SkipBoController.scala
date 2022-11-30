@@ -5,13 +5,22 @@ import play.api.mvc._
 import de.htwg.se.Skip_Bo.Skip_Bo
 import play.api.libs.json.{JsObject, JsValue, Json, Writes}
 
+
+
+import akka.actor.{Actor, ActorRef, ActorSystem, Props}
+import akka.stream.Materializer
+
+import play.api.libs.streams.ActorFlow
+
+import scala.swing.Reactor
+
 import scala.language.postfixOps
 /**
  * This controller creates an `Action` to handle HTTP requests to the
  * application's home page.
  */
 @Singleton
-class SkipBoController @Inject()(cc: ControllerComponents) extends AbstractController(cc) {
+class SkipBoController @Inject()(cc: ControllerComponents)(implicit system: ActorSystem, mat: Materializer) extends AbstractController(cc) {
 
   val gameController = Skip_Bo.controller
   gameController.startGame(5)
@@ -193,4 +202,131 @@ class SkipBoController @Inject()(cc: ControllerComponents) extends AbstractContr
       }
     }
   }
+
+//-------------------------------------------------WEBSOCKETS
+
+  def chat = Action {
+    Ok(views.html.chat())
+  }
+
+  var timestamp = 0
+  var lastMsg = ""
+
+  def receiveMsg = Action {
+    implicit request => {
+      println("received")
+      val req = request.body.asJson
+      val msg = req.get("msg").toString()
+      timestamp += 1
+      lastMsg = msg
+      Ok(Json.obj(
+        "timestamp" -> timestamp.toString)
+      )
+    }
+  }
+
+  def getChat = Action {
+    implicit request => {
+
+      val req = request.body.asJson
+      val ts = req.get("timestamp").toString()
+      while (ts.equals("\"" + timestamp.toString + "\"")) {}
+      Ok(Json.obj(
+        "timestamp" -> timestamp.toString,
+        "msg" -> lastMsg) //Num of current player 1 - 4
+      )
+    }
+  }
+
+  //---------- ende chat
+
+  def socket = WebSocket.accept[String, String] { request =>
+    ActorFlow.actorRef { out =>
+      Skip_BoSocketActor.props(out)
+    }
+  }
+
+  object Skip_BoSocketActor {
+    def props(out: ActorRef) = {
+      Props(new Skip_BoSocketActor(out))
+    }
+  }
+
+  def wsCommand(cmd:String, data:String, secretId:String): String = {
+    if (cmd.equals("addPlayer")) {
+      addplayer(data)
+      secretArray(gameController.game.players.size - 1) = scala.util.Random.nextInt(9999999).toString
+    }
+    if (secretArray(gameController.playerStatus.getCurrentPlayer - 1) == secretId) {
+      if (cmd.equals("start")) {
+        start
+      } else if (cmd.equals("rollDice")) {
+        rollDice
+      } else if (cmd.equals("selectFig")) {
+        val result = selectFigure(data.toInt)
+        return result
+      } else if (cmd.equals("figMove")) {
+        move(data)
+      } else if (cmd.equals("skip")) {
+        skip
+      } else if (cmd.equals("reset")) {
+        resetGame
+      } else if (cmd.equals("save")) {
+        saveGame
+      } else if (cmd.equals("load")) {
+        loadGame
+      } else if (cmd.equals("undo")) {
+        undoGame
+      } else if (cmd.equals("redo")) {
+        redoGame
+      }
+    } else if (secretArray.contains(secretId)) {
+      if (cmd.equals("reset")) {
+        resetGame
+      }
+    }
+    "Ok"
+  }
+
+  class Skip_BoSocketActor(out: ActorRef) extends Actor with Reactor {
+    listenTo(gameController)
+
+    def receive = {
+      case msg: String =>
+        val split_msg = msg.split('|')
+        if (split_msg.length == 3) {
+          val cmd = split_msg(0)
+          val data = split_msg(1)
+          val secredId = split_msg(2)
+          if (wsCommand(cmd, data, secredId).contains("Error")) {
+            out ! controllerToJson()
+          } else {
+            if (cmd.equals("addPlayer")) {
+              out ! controllerToJsonSID()
+            } else {
+              out ! controllerToJson()
+            }
+          }
+        }
+    }
+
+    reactions += {
+      case event: RollDice => out ! controllerToJson()
+      case event: Moving => out ! controllerToJson()
+      case event: ChooseFig => out ! controllerToJson()
+      //case event: SettingUp => out ! ("Update") //Überspringen, da bei Add player sofort auf Start Up wechselt
+      case event: StartUp => out ! controllerToJson()
+      case event: StartGame => out ! controllerToJson()
+      case event: WonGame => out ! controllerToJson()
+      case event: GameReset => out ! controllerToJson(1)
+      case event: GameSaved => out ! controllerToJson()
+      case event: GameLoaded => out ! controllerToJson()
+    }
+  }
+
+
+
+
+
+
 }

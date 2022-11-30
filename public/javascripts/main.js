@@ -1,3 +1,4 @@
+/*
 $(document).ready(function () {
     getData().then(() => {
         updateInputPanel();
@@ -6,8 +7,20 @@ $(document).ready(function () {
     })
 }
 )
+*/
+$(document).ready(function () {
+    getData().then(() => {
+        updateInputPanel();
+        updateGameBoard();
+        connectWebSocket();
+    })
+}
+)
 
 let data = {}; //Game data from controller
+
+let secretId = " "
+let playerNum = -1
 
 function getData() {
     return $.ajax({
@@ -43,11 +56,11 @@ function post(method, url, data) {
 
 function processCommand(cmd, data, data2) {
     console.log("CMD: " + cmd + " data1: " + data + " data2: " + data2);
-    post("POST", "/command", { "cmd": cmd, "data1": data, "data2": data2 }).then(() => {
+    post("POST", "/command", { "cmd": cmd, "data1": data, "data2": data2, "secretId": secretId.toString() }).then(() => {
         getData().then(() => {
-            updateInputPanel();
-            updateGameBoard();
-            refreshOnClickEvents();
+            //updateInputPanel();
+            //updateGameBoard();
+            //refreshOnClickEvents();
         })
     })
 }
@@ -231,7 +244,64 @@ function refreshOnClickEvents() {
     $('#spielerstapel_Ablagestapel').click(function () {
         spielerstapel_Ablagestapel_click()
     });
+    $('#chatButton').click(function () {
+        let params = `scrollbars=no,resizable=no,status=no,location=no,toolbar=no,menubar=no,
+width=0,height=0,left=-500,top=-500`;
+        window.open('/chat', 'test', params)
+    });
 }
+
+//----------------------------------------- WEBSOCKET
+
+function processCmdWS(cmd, data) {
+    websocket.send(cmd + "|" + data + "|" + secretId)
+}
+
+
+let websocket = new WebSocket("ws://localhost:9000/websocket");
+window.onbeforeunload = function () {
+    websocket.onclose = function () {
+        if (playerNum > 0 && playerNum < 5) {
+            processCommand("reset", "")
+        }
+    };
+    websocket.close();
+};
+
+function connectWebSocket() {
+
+    websocket.onopen = function (event) {
+        websocket.send("Trying to connect to Server");
+    }
+
+    websocket.onclose = function () {
+        if (playerNum > 0 && playerNum < 5) {
+            processCommand("reset", "")
+        }
+    };
+
+    websocket.onerror = function (error) {
+    };
+
+    websocket.onmessage = function (e) {
+        if (typeof e.data === "string") {
+            data = JSON.parse(e.data)
+            if (data.reset === 1) {
+                playerNum = -1
+                swal({
+                    icon: "warning",
+                    text: "Game has been reset! (Player left or game master chose to)",
+                    title: "Error!"
+                })
+            }
+            if (data.secretId.length > 1) {
+                secretId = data.secretId
+            }
+            updateGameNoAjax()
+        }
+    };
+}
+//-------------------------------------------------------------------------------------
 
 function hand_Ablagestapel_click() {
     let whichCard = $('#whichCard').val();
@@ -239,7 +309,8 @@ function hand_Ablagestapel_click() {
     let whereCard = $('#whereCard').val();
     let whereCardToInt = parseInt(whereCard);
     console.log(whereCard + " " + whichCard);
-    processCommand("hand_Ablagestapel", whichCardToInt, whereCardToInt);
+    //processCommand("hand_Ablagestapel", whichCardToInt, whereCardToInt);
+    processCmdWS("hand_Ablagestapel", whichCardToInt, whereCardToInt);
 }
 function hand_Hilfestapel_click() {
     let whichCard = $('#whichCard').val();
@@ -247,7 +318,8 @@ function hand_Hilfestapel_click() {
     let whereCard = $('#whereCard').val();
     console.log(whereCard + " " + whichCard);
     let whereCardToInt = parseInt(whereCard);
-    processCommand("hand_Hilfestapel", whichCardToInt, whereCardToInt);
+    //processCommand("hand_Hilfestapel", whichCardToInt, whereCardToInt);
+    processCmdWS("hand_Hilfestapel", whichCardToInt, whereCardToInt);
 }
 function hilfestapel_Ablagestapel_click() {
     let whichCard = $('#whichCard').val();
@@ -255,11 +327,13 @@ function hilfestapel_Ablagestapel_click() {
     let whereCard = $('#whereCard').val();
     let whereCardToInt = parseInt(whereCard);
     console.log(whereCard + " " + whichCard);
-    processCommand("hilfestapel_Ablagestapel", whichCardToInt, whereCardToInt);
+    //processCommand("hilfestapel_Ablagestapel", whichCardToInt, whereCardToInt);
+    processCmdWS("hilfestapel_Ablagestapel", whichCardToInt, whereCardToInt);
 }
 function spielerstapel_Ablagestapel_click(whereCard) {
     whereCard = $('#whereCard').val();
     whereCardToInt = parseInt(whereCard);
     console.log(whereCard + " " + whichCard);
-    processCommand("spielerstapel_Ablagestapel", whereCardToInt, "");
+    //processCommand("spielerstapel_Ablagestapel", whereCardToInt, "");
+    processCmdWS("spielerstapel_Ablagestapel", whereCardToInt, "");
 }
