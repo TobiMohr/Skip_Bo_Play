@@ -31,7 +31,7 @@ class SkipBoController @Inject()(cc: ControllerComponents) extends AbstractContr
 
   def hand_Hilfestapel(whichCard: Int, whereCard: Int) =  {
 
-    Console.printf(whichCard.toString, whereCard.toString)
+    
     gameController.pushCardHand(whereCard, whichCard, gameController.playerState.getPlayer, true);
   }
 
@@ -87,7 +87,16 @@ class SkipBoController @Inject()(cc: ControllerComponents) extends AbstractContr
     ))
   }
 
-  def playerHand(player: Int, whichCard: Int) = gameController.game.player(player).cards(whichCard).toString()
+  def playerHand(player: Int, whichCard: Int) = {
+
+    if (whichCard <= gameController.game.player(player).cards.size - 1) {
+        gameController.game.player(player).cards(whichCard).toString()
+    } else {
+      ""
+    }
+    
+
+  }
 
   def playerSpielerStapel(player: Int) = gameController.game.player(player).stack.head.toString()
 
@@ -112,11 +121,8 @@ class SkipBoController @Inject()(cc: ControllerComponents) extends AbstractContr
   def currentPlayer() = "Player " + gameController.playerState.name.toString 
 
 //----------------------------------------------------------------------------------------------------------------------
-  def processCommand(cmd: String, data1: String, data2: String): String = {
-
-      Console.printf(cmd)
-      var test = cmd.substring(1, cmd.length() - 1)
-      Console.printf(test)
+  def processCommand(cmd: String, data1: String, data2: String): String = {   
+    var test = cmd.substring(1, cmd.length() - 1)
 
     if (test.equals("hand_Ablagestapel")) {
 
@@ -125,8 +131,6 @@ class SkipBoController @Inject()(cc: ControllerComponents) extends AbstractContr
       this.hand_Ablagestapel(whichCard, whereCard)
 
     } else if (test.equals("hand_Hilfestapel")) {
-      Console.printf(data1 + " ")
-      Console.printf(data2)
       var whichCard = (data1.toInt) - 1
       var whereCard = (data2.toInt) - 1
       this.hand_Hilfestapel(whichCard, whereCard)
