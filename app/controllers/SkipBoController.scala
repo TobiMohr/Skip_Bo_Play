@@ -3,6 +3,7 @@ package controllers
 import javax.inject._
 import play.api.mvc._
 import de.htwg.se.Skip_Bo.Skip_Bo
+import de.htwg.se.Skip_Bo.controller.controllerComponent._
 import play.api.libs.json.{JsObject, JsValue, Json, Writes}
 
 
@@ -94,6 +95,40 @@ class SkipBoController @Inject()(cc: ControllerComponents)(implicit system: Acto
       "gamestate" -> gameController.gameState,
       "statusmessage" -> gameController.statusText
     ))
+  }
+
+  def gameToJson(): String ={
+    Json.obj(
+      "playerA_Hand_0" -> playerHand(0, 0),
+      "playerA_Hand_1" -> playerHand(0, 1),
+      "playerA_Hand_2" -> playerHand(0, 2),
+      "playerA_Hand_3" -> playerHand(0, 3),
+      "playerA_Hand_4" -> playerHand(0, 4),
+      "playerA_Spielerstapel_Value" -> playerSpielerStapel(0),
+      "playerA_Spielerstapel_Size" -> playerSpielerStapelSize(0),
+      "playerA_HelpStacks_0" -> playerHelpStacks(0, 0),
+      "playerA_HelpStacks_1" -> playerHelpStacks(0, 1),
+      "playerA_HelpStacks_2" -> playerHelpStacks(0, 2),
+      "playerA_HelpStacks_3" -> playerHelpStacks(0, 3),
+      "playerB_Hand_0" -> playerHand(1, 0),
+      "playerB_Hand_1" -> playerHand(1, 1),
+      "playerB_Hand_2" -> playerHand(1, 2),
+      "playerB_Hand_3" -> playerHand(1, 3),
+      "playerB_Hand_4" -> playerHand(1, 4),
+      "playerB_Spielerstapel_Value" -> playerSpielerStapel(1),
+      "playerB_Spielerstapel_Size" -> playerSpielerStapelSize(1),
+      "playerB_HelpStacks_0" -> playerHelpStacks(1, 0),
+      "playerB_HelpStacks_1" -> playerHelpStacks(1, 1),
+      "playerB_HelpStacks_2" -> playerHelpStacks(1, 2),
+      "playerB_HelpStacks_3" -> playerHelpStacks(1, 3),
+      "ablagestapel_0" -> ablageStapel(0),
+      "ablagestapel_1" -> ablageStapel(1),
+      "ablagestapel_2" -> ablageStapel(2),
+      "ablagestapel_3" -> ablageStapel(3),
+      "current_Player" -> currentPlayer(),
+      "gamestate" -> gameController.gameState,
+      "statusmessage" -> gameController.statusText
+    ).toString()
   }
 
   def playerHand(player: Int, whichCard: Int) = {
@@ -252,38 +287,22 @@ class SkipBoController @Inject()(cc: ControllerComponents)(implicit system: Acto
     }
   }
 
-  def wsCommand(cmd:String, data:String, secretId:String): String = {
-    if (cmd.equals("addPlayer")) {
-      addplayer(data)
-      secretArray(gameController.game.players.size - 1) = scala.util.Random.nextInt(9999999).toString
-    }
-    if (secretArray(gameController.playerStatus.getCurrentPlayer - 1) == secretId) {
-      if (cmd.equals("start")) {
-        start
-      } else if (cmd.equals("rollDice")) {
-        rollDice
-      } else if (cmd.equals("selectFig")) {
-        val result = selectFigure(data.toInt)
-        return result
-      } else if (cmd.equals("figMove")) {
-        move(data)
-      } else if (cmd.equals("skip")) {
-        skip
-      } else if (cmd.equals("reset")) {
-        resetGame
-      } else if (cmd.equals("save")) {
-        saveGame
-      } else if (cmd.equals("load")) {
-        loadGame
-      } else if (cmd.equals("undo")) {
-        undoGame
-      } else if (cmd.equals("redo")) {
-        redoGame
-      }
-    } else if (secretArray.contains(secretId)) {
-      if (cmd.equals("reset")) {
-        resetGame
-      }
+  def wsCommand(cmd: String, data1: String, data2: String): String = {
+    if (cmd.equals("hand_Ablagestapel")){
+      var whichCard = (data1.toInt) - 1
+      var whereCard = (data2.toInt) - 1
+      this.hand_Ablagestapel(whichCard, whereCard)
+    } else if (cmd.equals("hand_Hilfestapel")) {
+      var whichCard = (data1.toInt) - 1
+      var whereCard = (data2.toInt) - 1
+      this.hand_Hilfestapel(whichCard, whereCard)
+    } else if (cmd.equals("hilfestapel_Ablagestapel")) {
+      var whichCard = (data1.toInt) - 1
+      var whereCard = (data2.toInt) - 1
+      this.hilfestapel_Ablagestapel(whichCard, whereCard)
+    } else if (cmd.equals("spielerstapel_Ablagestapel")) {
+      var whereCard = (data1.toInt) - 1
+      this.spielerstapel_Ablagestapel(whereCard)
     }
     "Ok"
   }
@@ -296,31 +315,15 @@ class SkipBoController @Inject()(cc: ControllerComponents)(implicit system: Acto
         val split_msg = msg.split('|')
         if (split_msg.length == 3) {
           val cmd = split_msg(0)
-          val data = split_msg(1)
-          val secredId = split_msg(2)
-          if (wsCommand(cmd, data, secredId).contains("Error")) {
-            out ! controllerToJson()
-          } else {
-            if (cmd.equals("addPlayer")) {
-              out ! controllerToJsonSID()
-            } else {
-              out ! controllerToJson()
-            }
-          }
+          val data1 = split_msg(1)
+          val data2 = split_msg(2)
+          wsCommand(cmd, data1, data2)
+          out ! gameToJson()
         }
     }
 
     reactions += {
-      case event: RollDice => out ! controllerToJson()
-      case event: Moving => out ! controllerToJson()
-      case event: ChooseFig => out ! controllerToJson()
-      //case event: SettingUp => out ! ("Update") //Überspringen, da bei Add player sofort auf Start Up wechselt
-      case event: StartUp => out ! controllerToJson()
-      case event: StartGame => out ! controllerToJson()
-      case event: WonGame => out ! controllerToJson()
-      case event: GameReset => out ! controllerToJson(1)
-      case event: GameSaved => out ! controllerToJson()
-      case event: GameLoaded => out ! controllerToJson()
+      case event: CardPlaced => out ! gameToJson()
     }
   }
 

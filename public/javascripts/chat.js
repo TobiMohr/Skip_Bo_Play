@@ -10,7 +10,7 @@ let userID = "";
 
 function randomUserId() {
     userID = Math.floor(Math.random() * 100000).toString();
-    userID = "User-" + userID
+    userID = "Spieler-" + userID
     $('#userId').get(0).innerText = "Your ID: " + userID
 }
 

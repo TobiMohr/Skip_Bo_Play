@@ -1,26 +1,14 @@
-/*
 $(document).ready(function () {
     getData().then(() => {
         updateInputPanel();
         updateGameBoard();
         refreshOnClickEvents();
-    })
-}
-)
-*/
-$(document).ready(function () {
-    getData().then(() => {
-        updateInputPanel();
-        updateGameBoard();
         connectWebSocket();
     })
 }
 )
 
 let data = {}; //Game data from controller
-
-let secretId = " "
-let playerNum = -1
 
 function getData() {
     return $.ajax({
@@ -56,10 +44,10 @@ function post(method, url, data) {
 
 function processCommand(cmd, data, data2) {
     console.log("CMD: " + cmd + " data1: " + data + " data2: " + data2);
-    post("POST", "/command", { "cmd": cmd, "data1": data, "data2": data2, "secretId": secretId.toString() }).then(() => {
+    post("POST", "/command", { "cmd": cmd, "data1": data, "data2": data2 }).then(() => {
         getData().then(() => {
-            //updateInputPanel();
-            //updateGameBoard();
+            updateInputPanel();
+            updateGameBoard();
             //refreshOnClickEvents();
         })
     })
@@ -78,7 +66,6 @@ function updateGameBoard() {
     let gameState = data.gamestate;
     let statusmessage = data.statusmessage;
 
-    console.log(playerA_Spielerstapel_Value);
     $('#playerLabel').empty();
     $('#playerLabel').append(current_Player);
 
@@ -253,17 +240,22 @@ width=0,height=0,left=-500,top=-500`;
 
 //----------------------------------------- WEBSOCKET
 
-function processCmdWS(cmd, data) {
-    websocket.send(cmd + "|" + data + "|" + secretId)
+function updateGameNoAjax(){
+    updateInputPanel();
+    updateGameBoard();
+    refreshOnClickEvents();
+}
+
+function processCmdWS(cmd, data1, data2) {
+    console.log("process " + cmd + ",   " + data1 + ".    " + data2)
+    websocket.send(cmd + "|" + data1 + "|" + data2)
 }
 
 
 let websocket = new WebSocket("ws://localhost:9000/websocket");
 window.onbeforeunload = function () {
     websocket.onclose = function () {
-        if (playerNum > 0 && playerNum < 5) {
-            processCommand("reset", "")
-        }
+        console.log("closed beforeunlaod")
     };
     websocket.close();
 };
@@ -275,9 +267,7 @@ function connectWebSocket() {
     }
 
     websocket.onclose = function () {
-        if (playerNum > 0 && playerNum < 5) {
-            processCommand("reset", "")
-        }
+        console.log("closed")
     };
 
     websocket.onerror = function (error) {
@@ -286,17 +276,6 @@ function connectWebSocket() {
     websocket.onmessage = function (e) {
         if (typeof e.data === "string") {
             data = JSON.parse(e.data)
-            if (data.reset === 1) {
-                playerNum = -1
-                swal({
-                    icon: "warning",
-                    text: "Game has been reset! (Player left or game master chose to)",
-                    title: "Error!"
-                })
-            }
-            if (data.secretId.length > 1) {
-                secretId = data.secretId
-            }
             updateGameNoAjax()
         }
     };
