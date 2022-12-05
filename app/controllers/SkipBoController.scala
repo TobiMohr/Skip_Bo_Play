@@ -97,40 +97,6 @@ class SkipBoController @Inject()(cc: ControllerComponents)(implicit system: Acto
     ))
   }
 
-  def gameToJson(): String ={
-    Json.obj(
-      "playerA_Hand_0" -> playerHand(0, 0),
-      "playerA_Hand_1" -> playerHand(0, 1),
-      "playerA_Hand_2" -> playerHand(0, 2),
-      "playerA_Hand_3" -> playerHand(0, 3),
-      "playerA_Hand_4" -> playerHand(0, 4),
-      "playerA_Spielerstapel_Value" -> playerSpielerStapel(0),
-      "playerA_Spielerstapel_Size" -> playerSpielerStapelSize(0),
-      "playerA_HelpStacks_0" -> playerHelpStacks(0, 0),
-      "playerA_HelpStacks_1" -> playerHelpStacks(0, 1),
-      "playerA_HelpStacks_2" -> playerHelpStacks(0, 2),
-      "playerA_HelpStacks_3" -> playerHelpStacks(0, 3),
-      "playerB_Hand_0" -> playerHand(1, 0),
-      "playerB_Hand_1" -> playerHand(1, 1),
-      "playerB_Hand_2" -> playerHand(1, 2),
-      "playerB_Hand_3" -> playerHand(1, 3),
-      "playerB_Hand_4" -> playerHand(1, 4),
-      "playerB_Spielerstapel_Value" -> playerSpielerStapel(1),
-      "playerB_Spielerstapel_Size" -> playerSpielerStapelSize(1),
-      "playerB_HelpStacks_0" -> playerHelpStacks(1, 0),
-      "playerB_HelpStacks_1" -> playerHelpStacks(1, 1),
-      "playerB_HelpStacks_2" -> playerHelpStacks(1, 2),
-      "playerB_HelpStacks_3" -> playerHelpStacks(1, 3),
-      "ablagestapel_0" -> ablageStapel(0),
-      "ablagestapel_1" -> ablageStapel(1),
-      "ablagestapel_2" -> ablageStapel(2),
-      "ablagestapel_3" -> ablageStapel(3),
-      "current_Player" -> currentPlayer(),
-      "gamestate" -> gameController.gameState,
-      "statusmessage" -> gameController.statusText
-    ).toString()
-  }
-
   def playerHand(player: Int, whichCard: Int) = {
 
     if (whichCard <= gameController.game.player(player).cards.size - 1) {
@@ -240,41 +206,6 @@ class SkipBoController @Inject()(cc: ControllerComponents)(implicit system: Acto
 
 //-------------------------------------------------WEBSOCKETS
 
-  def chat = Action {
-    Ok(views.html.chat())
-  }
-
-  var timestamp = 0
-  var lastMsg = ""
-
-  def receiveMsg = Action {
-    implicit request => {
-      println("received")
-      val req = request.body.asJson
-      val msg = req.get("msg").toString()
-      timestamp += 1
-      lastMsg = msg
-      Ok(Json.obj(
-        "timestamp" -> timestamp.toString)
-      )
-    }
-  }
-
-  def getChat = Action {
-    implicit request => {
-
-      val req = request.body.asJson
-      val ts = req.get("timestamp").toString()
-      while (ts.equals("\"" + timestamp.toString + "\"")) {}
-      Ok(Json.obj(
-        "timestamp" -> timestamp.toString,
-        "msg" -> lastMsg) //Num of current player 1 - 4
-      )
-    }
-  }
-
-  //---------- ende chat
-
   def socket = WebSocket.accept[String, String] { request =>
     ActorFlow.actorRef { out =>
       Skip_BoSocketActor.props(out)
@@ -320,6 +251,40 @@ class SkipBoController @Inject()(cc: ControllerComponents)(implicit system: Acto
           wsCommand(cmd, data1, data2)
           out ! gameToJson()
         }
+    }
+
+    def gameToJson(): String = {
+      Json.obj(
+        "playerA_Hand_0" -> playerHand(0, 0),
+        "playerA_Hand_1" -> playerHand(0, 1),
+        "playerA_Hand_2" -> playerHand(0, 2),
+        "playerA_Hand_3" -> playerHand(0, 3),
+        "playerA_Hand_4" -> playerHand(0, 4),
+        "playerA_Spielerstapel_Value" -> playerSpielerStapel(0),
+        "playerA_Spielerstapel_Size" -> playerSpielerStapelSize(0),
+        "playerA_HelpStacks_0" -> playerHelpStacks(0, 0),
+        "playerA_HelpStacks_1" -> playerHelpStacks(0, 1),
+        "playerA_HelpStacks_2" -> playerHelpStacks(0, 2),
+        "playerA_HelpStacks_3" -> playerHelpStacks(0, 3),
+        "playerB_Hand_0" -> playerHand(1, 0),
+        "playerB_Hand_1" -> playerHand(1, 1),
+        "playerB_Hand_2" -> playerHand(1, 2),
+        "playerB_Hand_3" -> playerHand(1, 3),
+        "playerB_Hand_4" -> playerHand(1, 4),
+        "playerB_Spielerstapel_Value" -> playerSpielerStapel(1),
+        "playerB_Spielerstapel_Size" -> playerSpielerStapelSize(1),
+        "playerB_HelpStacks_0" -> playerHelpStacks(1, 0),
+        "playerB_HelpStacks_1" -> playerHelpStacks(1, 1),
+        "playerB_HelpStacks_2" -> playerHelpStacks(1, 2),
+        "playerB_HelpStacks_3" -> playerHelpStacks(1, 3),
+        "ablagestapel_0" -> ablageStapel(0),
+        "ablagestapel_1" -> ablageStapel(1),
+        "ablagestapel_2" -> ablageStapel(2),
+        "ablagestapel_3" -> ablageStapel(3),
+        "current_Player" -> currentPlayer(),
+        "gamestate" -> gameController.gameState,
+        "statusmessage" -> gameController.statusText
+      ).toString()
     }
 
     reactions += {

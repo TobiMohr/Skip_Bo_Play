@@ -231,11 +231,6 @@ function refreshOnClickEvents() {
     $('#spielerstapel_Ablagestapel').click(function () {
         spielerstapel_Ablagestapel_click()
     });
-    $('#chatButton').click(function () {
-        let params = `scrollbars=no,resizable=no,status=no,location=no,toolbar=no,menubar=no,
-width=0,height=0,left=-500,top=-500`;
-        window.open('/chat', 'test', params)
-    });
 }
 
 //----------------------------------------- WEBSOCKET
