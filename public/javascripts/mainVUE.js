@@ -31,6 +31,8 @@ app.component('gameboard', {
             hilfeStapel3: "",
             hilfeStapel4: "",
 
+            selected: "",
+
         }
     },
     computed() {
@@ -57,8 +59,8 @@ app.component('gameboard', {
             };
 
             this.websocketVUE.onmessage = (e) => {
-            console.log("onmessage: ")
-            console.log(e.data)
+                console.log("onmessage: ")
+                console.log(e.data)
                 if (typeof e.data === "string") {
                     this.data = JSON.parse(e.data)
                     this.getData();
@@ -173,14 +175,13 @@ app.component('gameboard', {
         },
 
         hand_Ablagestapel_click() {
-            console.log("TEST HIER ?");
             let whichCard = $('#whichCard').val();
             let whichCardToInt = parseInt(whichCard);
             let whereCard = $('#whereCard').val();
             let whereCardToInt = parseInt(whereCard);
-            console.log(whereCard + " " + whichCard);
             this.processCmdWS("hand_Ablagestapel", whichCardToInt, whereCardToInt);
         },
+
         hand_Hilfestapel_click() {
             let whichCard = $('#whichCard').val();
             let whichCardToInt = parseInt(whichCard);
@@ -203,35 +204,66 @@ app.component('gameboard', {
             console.log(whereCard + " " + whichCard);
             this.processCmdWS("spielerstapel_Ablagestapel", whereCardToInt, "");
         },
+        playTheGameWithClicks(whichCard) {
+            let count = 0;
+            for (let i = 0; i < this.selected.length; i++) {
+                if (this.selected[i] === ',') {
+                    count++;
+                }
+            }
+            if (count === 4) {
+                this.selected = "";
+            }
+            let test = whichCard.split(" ")
+            console.log(test[0]);
+            console.log(test[1]);
+            this.selected += test;
+            console.log(this.selected)
+            if (count === 2) {
+                let arrayStrings = this.selected.split(",");
+                if (arrayStrings[0] === 'Hand' && arrayStrings[2] === 'Hilfe') {
+                    this.processCmdWS("hand_Hilfestapel", parseInt(arrayStrings[1]), parseInt(arrayStrings[3]));
+                }
+                if (arrayStrings[0] === 'Hand' && arrayStrings[2] === 'Ablage') {
+                    this.processCmdWS("hand_Ablagestapel", parseInt(arrayStrings[1]), parseInt(arrayStrings[3]));
+                }
+                if (arrayStrings[0] === 'Hilfe' && arrayStrings[2] === 'Ablage') {
+                    this.processCmdWS("hilfestapel_Ablagestapel", parseInt(arrayStrings[1]), parseInt(arrayStrings[3]));
+                }
+                if (arrayStrings[0] === 'Spielerkarte' && arrayStrings[2] === 'Ablage') {
+                    this.processCmdWS("spielerstapel_Ablagestapel", parseInt(arrayStrings[3], ""));
+                }
+            }
+        }
     },
     template: `
     <div>
     <p> Spielerkarten </p>
-    <img v-bind:src="'/assets/images/' + spielerErsteKarte + 'Card.png'" class = "playerCards">
-    <img v-bind:src="'/assets/images/' + spielerZweiteKarte + 'Card.png'" class = "playerCards">
-    <img v-bind:src="'/assets/images/' + spielerDritteKarte + 'Card.png'" class = "playerCards">
-    <img v-bind:src="'/assets/images/' + spielerVierteKarte + 'Card.png'" class = "playerCards">
-    <img v-bind:src="'/assets/images/' + spielerFünfteKarte + 'Card.png'" class = "playerCards">
+    <img v-bind:src="'/assets/images/' + spielerErsteKarte + 'Card.png'" class = "playerCards" @click="playTheGameWithClicks('Hand 1 ')">
+    <img v-bind:src="'/assets/images/' + spielerZweiteKarte + 'Card.png'" class = "playerCards" @click="playTheGameWithClicks('Hand 2 ')">
+    <img v-bind:src="'/assets/images/' + spielerDritteKarte + 'Card.png'" class = "playerCards" @click="playTheGameWithClicks('Hand 3 ')">
+    <img v-bind:src="'/assets/images/' + spielerVierteKarte + 'Card.png'" class = "playerCards" @click="playTheGameWithClicks('Hand 4 ')">
+    <img v-bind:src="'/assets/images/' + spielerFünfteKarte + 'Card.png'" class = "playerCards" @click="playTheGameWithClicks('Hand 5 ')">
     </div>
 
 
     <div>
     <p> Hilfekarten </p>
-    <img v-bind:src="'/assets/images/' + hilfeStapel1 + 'Card.png'" class = "playerCards">
-    <img v-bind:src="'/assets/images/' + hilfeStapel2 + 'Card.png'" class = "playerCards">
-    <img v-bind:src="'/assets/images/' + hilfeStapel3 + 'Card.png'" class = "playerCards">
-    <img v-bind:src="'/assets/images/' + hilfeStapel4 + 'Card.png'" class = "playerCards">
+    <img v-bind:src="'/assets/images/' + hilfeStapel1 + 'Card.png'" class = "playerCards" @click="playTheGameWithClicks('Hilfe 1 ')">
+    <img v-bind:src="'/assets/images/' + hilfeStapel2 + 'Card.png'" class = "playerCards" @click="playTheGameWithClicks('Hilfe 2 ')">
+    <img v-bind:src="'/assets/images/' + hilfeStapel3 + 'Card.png'" class = "playerCards" @click="playTheGameWithClicks('Hilfe 3 ')">
+    <img v-bind:src="'/assets/images/' + hilfeStapel4 + 'Card.png'" class = "playerCards" @click="playTheGameWithClicks('Hilfe 4 ')">
     </div>
     <div>
     <p> Abgelegene Karten </p>
-    <img v-bind:src="'/assets/images/' + ablageStapel1 + 'Card.png'" class = "playerCards">
-    <img v-bind:src="'/assets/images/' + ablageStapel2 + 'Card.png'" class = "playerCards">
-    <img v-bind:src="'/assets/images/' + ablageStapel3 + 'Card.png'" class = "playerCards">
-    <img v-bind:src="'/assets/images/' + ablageStapel4 + 'Card.png'" class = "playerCards">
+    <img v-bind:src="'/assets/images/' + ablageStapel1 + 'Card.png'" class = "playerCards" @click="playTheGameWithClicks('Ablage 1 ')">
+    <img v-bind:src="'/assets/images/' + ablageStapel2 + 'Card.png'" class = "playerCards" @click="playTheGameWithClicks('Ablage 2 ')">
+    <img v-bind:src="'/assets/images/' + ablageStapel3 + 'Card.png'" class = "playerCards" @click="playTheGameWithClicks('Ablage 3 ')">
+    <img v-bind:src="'/assets/images/' + ablageStapel4 + 'Card.png'" class = "playerCards" @click="playTheGameWithClicks('Ablage 4 ')">
     </div>
     <div>
     <p> SpielerKarte </p>
-    <img v-bind:src="'/assets/images/' + spielerStapel_Value + 'Card.png'" class = "playerCards">
+    <img v-bind:src="'/assets/images/' + spielerStapel_Value + 'Card.png'" class = "playerCards" @click="playTheGameWithClicks('Spielerkarte 1 ')">
     {{spielerStapel_Size}}
     </div>
     <div class="col-xl-3">
