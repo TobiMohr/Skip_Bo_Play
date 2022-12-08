@@ -16,69 +16,106 @@ app.component('gameboard', {
             current_Player: " ",
             gameState: " ",
             statusmessage: " ",
+
+            spielerStapel_Value: "",
+            spielerStapel_Size: 0,
+
+            spielerErsteKarte: "",
+            spielerZweiteKarte: "",
+            spielerDritteKarte: "",
+            spielerVierteKarte: "",
+            spielerFünfteKarte: "",
+
+            hilfeStapel1: "",
+            hilfeStapel2: "",
+            hilfeStapel3: "",
+            hilfeStapel4: "",
+
         }
+    },
+    computed() {
+        this.loadPlayerCards();
+        this.loadHelpStack();
+        this.loadAblageStack();
+        this.loadSpielerStack();
     },
     created() {
         this.getData();
         this.connectWebSocket();
     },
-    computed: {
-
-    },
     methods: {
         connectWebSocket() {
-            this.websocketVUE.onopen = function (event) {
+            this.websocketVUE.onopen = (event) => {
                 this.websocketVUE.send("Trying to connect to Server");
             }
 
-            this.websocketVUE.onclose = function () {
+            this.websocketVUE.onclose = (event) => {
                 console.log("closed")
             };
 
-            this.websocketVUE.onerror = function (error) {
+            this.websocketVUE.onerror = (event) => {
             };
 
-            this.websocketVUE.onmessage = function (e) {
+            this.websocketVUE.onmessage = (e) => {
                 if (typeof e.data === "string") {
-                    data = JSON.parse(e.data)
-                    updateGameNoAjax()
+                    this.data = JSON.parse(e.data)
+                    this.loadPlayerCards();
+                    this.loadHelpStack();
+                    this.loadAblageStack();
+                    this.loadSpielerStack();
                 }
             };
 
         },
-
-        loadFirst() {
-            if (current_Player === "Player A") {
-                return getCardImage(this.data.playerA_HelpStacks_0);
+        loadPlayerCards() {
+            if (this.current_Player === "Player A") {
+                this.spielerErsteKarte = this.data.playerA_Hand_0;
+                this.spielerZweiteKarte = this.data.playerA_Hand_1;
+                this.spielerDritteKarte = this.data.playerA_Hand_2;
+                this.spielerVierteKarte = this.data.playerA_Hand_3;
+                this.spielerFünfteKarte = this.data.playerA_Hand_4;
             } else {
-                return getCardImage(this.data.playerB_HelpStacks_0);
-            }
-        },
-        loadSecond() {
-            if (current_Player === "Player A") {
-                return getCardImage(this.data.playerA_HelpStacks_1);
-            } else {
-                return getCardImage(this.data.playerB_HelpStacks_1);
-            }
-        },
-        loadThird() {
-            if (current_Player === "Player A") {
-                return getCardImage(this.data.playerA_HelpStacks_2);
-            } else {
-                return getCardImage(this.data.playerB_HelpStacks_2);
-            }
-        },
-        loadFourth() {
-            if (current_Player === "Player A") {
-                return getCardImage(this.data.playerA_HelpStacks_3);
-            } else {
-                return getCardImage(this.data.playerB_HelpStacks_3);
+                this.spielerErsteKarte = this.data.playerB_Hand_0;
+                this.spielerZweiteKarte = this.data.playerB_Hand_1;
+                this.spielerDritteKarte = this.data.playerB_Hand_2;
+                this.spielerVierteKarte = this.data.playerB_Hand_3;
+                this.spielerFünfteKarte = this.data.playerB_Hand_4;
             }
         },
 
+        loadHelpStack() {
+            if (this.current_Player === "Player A") {
+                this.hilfeStapel1 = this.data.playerA_HelpStacks_0;
+                this.hilfeStapel2 = this.data.playerA_HelpStacks_1;
+                this.hilfeStapel3 = this.data.playerA_HelpStacks_2;
+                this.hilfeStapel4 = this.data.playerA_HelpStacks_3;
+            } else {
+                this.hilfeStapel1 = this.data.playerB_HelpStacks_0;
+                this.hilfeStapel2 = this.data.playerB_HelpStacks_1;
+                this.hilfeStapel3 = this.data.playerB_HelpStacks_2;
+                this.hilfeStapel4 = this.data.playerB_HelpStacks_3;
+            }
+        },
+
+        loadAblageStack() {
+            this.ablageStapel1 = this.data.ablagestapel_0;
+            this.ablageStapel2 = this.data.ablagestapel_1;
+            this.ablageStapel3 = this.data.ablagestapel_2;
+            this.ablageStapel4 = this.data.ablagestapel_3;
+        },
+
+        loadSpielerStack() {
+            if (this.current_Player === "Player A") {
+                this.spielerStapel_Value = this.data.playerA_Spielerstapel_Value;
+                this.spielerStapel_Size = this.data.playerA_Spielerstapel_Size;
+            } else {
+                this.spielerStapel_Value = this.data.playerB_Spielerstapel_Value;
+                this.spielerStapel_Size = this.data.playerB_Spielerstapel_Size;
+            }
+        },
         processCmdWS(cmd, data1, data2) {
             console.log("process " + cmd + ",   " + data1 + ".    " + data2)
-            websocketVUE.send(cmd + "|" + data1 + "|" + data2)
+            this.websocketVUE.send(cmd + "|" + data1 + "|" + data2)
         },
 
         processCommand(cmd, data, data2) {
@@ -100,8 +137,8 @@ app.component('gameboard', {
                 contentType: "application/json",
 
                 success: function (response) {
-                    data = response;
-                    console.log(data);
+                    this.data = response;
+                    console.log(this.data);
                 },
                 error: function (response) {
                     console.log("Error");
@@ -109,11 +146,8 @@ app.component('gameboard', {
                 }
             });
         },
-
         getData() {
-
             let that = this;
-
             return $.ajax({
                 method: "GET",
                 url: "/status",
@@ -131,177 +165,12 @@ app.component('gameboard', {
                     that.current_Player = response.current_Player;
                     that.gameState = response.gamestate;
                     that.statusmessage = response.statusmessage;
-                    that.updateGameBoard();
+                    that.loadPlayerCards();
+                    that.loadHelpStack();
+                    that.loadAblageStack();
+                    that.loadSpielerStack();
                 }
             });
-        },
-
-        updateGameBoard() {
-            let playerA_Spielerstapel_Value = this.data.playerA_Spielerstapel_Value;
-            let playerA_Spielerstapel_Size = this.data.playerA_Spielerstapel_Size;
-            let playerB_Spielerstapel_Value = this.data.playerB_Spielerstapel_Value;
-            let playerB_Spielerstapel_Size = this.data.playerB_Spielerstapel_Size;
-            let ablageStapel1 = this.data.ablageStapel_0;
-            let ablageStapel2 = this.data.ablageStapel_1;
-            let ablageStapel3 = this.data.ablageStapel_2;
-            let ablageStapel4 = this.data.ablageStapel_3;
-            let current_Player = this.data.current_Player;
-            let gameState = this.data.gamestate;
-            let statusmessage = this.data.statusmessage;
-
-            $('#playerLabel').empty();
-            $('#playerLabel').append(current_Player);
-
-            $('#statusText').empty();
-            $('#statusText').append(statusmessage);
-
-            const playerStack = $('#spielerStapel').get(0);
-            playerStack.innerHTML = "";
-            if (current_Player === "Player A") {
-                $('#playerIcon').attr("src", "/assets/images/playerA.png");
-                playerStack.innerHTML = playerStack.innerHTML + `<p>Spielerstapel: | ${playerA_Spielerstapel_Value} |
-                                                                                        -
-                                                                                        verbleibende Karten:
-                                                                                        ${playerA_Spielerstapel_Size} </p>`;
-            } else if (current_Player === "Player B") {
-                $('#playerIcon').attr("src", "/assets/images/playerB.png");
-                playerStack.innerHTML = playerStack.innerHTML + `<p>Spielerstapel: | ${playerB_Spielerstapel_Value} |
-                                                                                                -
-                                                                                                verbleibende Karten:
-                                                                                                ${playerB_Spielerstapel_Size} </p>`;
-            }
-
-            const parenHandKartenStack = $('#HandKartenID').get(0);
-            parenHandKartenStack.innerHTML = "<p> Handkarten: ";
-            if (current_Player === "Player A") {
-                if (data.playerA_Hand_0 === "" && data.playerA_Hand_1 === "" && data.playerA_Hand_2 === "" && data.playerA_Hand_3 === "" && data.playerA_Hand_4 === "") {
-                    parenHandKartenStack.innerHTML += "| 0 | | 0 | | 0 | | 0 | | 0 |";
-                } else {
-                    if (data.playerA_Hand_0 !== "") {
-                        parenHandKartenStack.innerHTML += "| " + data.playerA_Hand_0 + " | ";
-                    }
-                    if (data.playerA_Hand_1 !== "") {
-                        parenHandKartenStack.innerHTML += "| " + data.playerA_Hand_1 + " | ";
-                    }
-                    if (data.playerA_Hand_2 !== "") {
-                        parenHandKartenStack.innerHTML += "| " + data.playerA_Hand_2 + " | ";
-                    }
-                    if (data.playerA_Hand_3 !== "") {
-                        parenHandKartenStack.innerHTML += "| " + data.playerA_Hand_3 + " | ";
-                    }
-                    if (data.playerA_Hand_4 !== "") {
-                        parenHandKartenStack.innerHTML += "| " + data.playerA_Hand_4 + " | ";
-                    }
-                    parenHandKartenStack.innerHTML += "</p>";
-                }
-            } else {
-                if (data.playerB_Hand_0 === "" && data.playerB_Hand_1 === "" && data.playerB_Hand_2 === "" && data.playerB_Hand_3 === "" && data.playerB_Hand_4 === "") {
-                    parenHandKartenStack.innerHTML += "| 0 | | 0 | | 0 | | 0 | | 0 |";
-                } else {
-                    if (data.playerB_Hand_0 !== "") {
-                        parenHandKartenStack.innerHTML += "| " + data.playerB_Hand_0 + " | ";
-                    }
-                    if (data.playerB_Hand_1 !== "") {
-                        parenHandKartenStack.innerHTML += "| " + data.playerB_Hand_1 + " | ";
-                    }
-                    if (data.playerB_Hand_2 !== "") {
-                        parenHandKartenStack.innerHTML += "| " + data.playerB_Hand_2 + " | ";
-                    }
-                    if (data.playerB_Hand_3 !== "") {
-                        parenHandKartenStack.innerHTML += "| " + data.playerB_Hand_3 + " | ";
-                    }
-                    if (data.playerB_Hand_4 !== "") {
-                        parenHandKartenStack.innerHTML += "| " + data.playerB_Hand_4 + " | ";
-                    }
-                    parenHandKartenStack.innerHTML += "</p>";
-                }
-            }
-
-            const parentHelpStack = $('#helpStackID').get(0);
-            parentHelpStack.innerHTML = "<p>Hilfestapel:</p>";
-            if (current_Player === "Player A") {
-                if (data.playerA_HelpStacks_0 === "") {
-                    parentHelpStack.innerHTML += "<p>| leer |</p>";
-                } else {
-                    parentHelpStack.innerHTML += "<p>|" + data.playerA_HelpStacks_0 + "|</p>"
-                }
-                if (data.playerA_HelpStacks_1 === "") {
-                    parentHelpStack.innerHTML += "<p>| leer |</p>";
-                } else {
-                    parentHelpStack.innerHTML += "<p>|" + data.playerA_HelpStacks_1 + "|</p>"
-                }
-                if (data.playerA_HelpStacks_2 === "") {
-                    parentHelpStack.innerHTML += "<p>| leer |</p>";
-                } else {
-                    parentHelpStack.innerHTML += "<p>|" + data.playerA_HelpStacks_2 + "|</p>"
-                }
-                if (data.playerA_HelpStacks_3 === "") {
-                    parentHelpStack.innerHTML += "<p>| leer |</p>";
-                } else {
-                    parentHelpStack.innerHTML += "<p>|" + data.playerA_HelpStacks_3 + "|</p>"
-                }
-            } else {
-                if (data.playerB_HelpStacks_0 === "") {
-                    parentHelpStack.innerHTML += "<p>| leer |</p>";
-                } else {
-                    parentHelpStack.innerHTML += "<p>|" + data.playerB_HelpStacks_0 + "|</p>"
-                }
-                if (data.playerB_HelpStacks_1 === "") {
-                    parentHelpStack.innerHTML += "<p>| leer |</p>";
-                } else {
-                    parentHelpStack.innerHTML += "<p>|" + data.playerB_HelpStacks_1 + "|</p>"
-                }
-                if (data.playerB_HelpStacks_2 === "") {
-                    parentHelpStack.innerHTML += "<p>| leer |</p>";
-                } else {
-                    parentHelpStack.innerHTML += "<p>|" + data.playerB_HelpStacks_2 + "|</p>"
-                }
-                if (data.playerB_HelpStacks_3 === "") {
-                    parentHelpStack.innerHTML += "<p>| leer |</p>";
-                } else {
-                    parentHelpStack.innerHTML += "<p>|" + data.playerB_HelpStacks_3 + "|</p>"
-                }
-            }
-
-            const parent = $('#AblageStapelID').get(0);
-            parent.innerHTML = "<p>AblageStapel: | " + data.ablagestapel_0 + " | " + data.ablagestapel_1 + " | " + data.ablagestapel_2 + " | " + data.ablagestapel_3 + " |</p>";
-
-        },
-
-        getCardImage(cardValue) {
-            switch (cardValue) {
-                case "1":
-                    return "<img src='./images/firstCard.png'>";
-                case "2":
-                    return "<img src='./images/secondCard.png'>";
-                case "3":
-                    return "<img src='./images/thirdCard.png'>";
-                case "4":
-                    return "<img src='./images/fourthCard.png'>";
-                case "5":
-                    return "<img src='./images/fifthCard.png'>";
-                case "6":
-                    return "<img src='./images/sixthCard.png'>";
-                case "7":
-                    return "<img src='./images/seventhCard.png'>";
-                case "8":
-                    return "<img src='./images/eightCard.png'>";
-                case "9":
-                    return "<img src='./images/ninethCard.png'>";
-                case "10":
-                    return "<img src='./images/tenCard.png'>";
-                case "11":
-                    return "<img src='./images/elevenCard.png'>";
-                case "12":
-                    return "<img src='./images/twelveCard.png'>";
-                case "J":
-                    return "<img src='./images/jokerCard.png'>";
-                case "":
-                    return "leer";
-                default:
-                    console.log("Du Opfer");
-                    break;
-            }
         },
 
         hand_Ablagestapel_click() {
@@ -311,8 +180,7 @@ app.component('gameboard', {
             let whereCard = $('#whereCard').val();
             let whereCardToInt = parseInt(whereCard);
             console.log(whereCard + " " + whichCard);
-            //processCommand("hand_Ablagestapel", whichCardToInt, whereCardToInt);
-            processCmdWS("hand_Ablagestapel", whichCardToInt, whereCardToInt);
+            this.processCmdWS("hand_Ablagestapel", whichCardToInt, whereCardToInt);
         },
         hand_Hilfestapel_click() {
             let whichCard = $('#whichCard').val();
@@ -320,8 +188,7 @@ app.component('gameboard', {
             let whereCard = $('#whereCard').val();
             console.log(whereCard + " " + whichCard);
             let whereCardToInt = parseInt(whereCard);
-            //processCommand("hand_Hilfestapel", whichCardToInt, whereCardToInt);
-            processCmdWS("hand_Hilfestapel", whichCardToInt, whereCardToInt);
+            this.processCmdWS("hand_Hilfestapel", whichCardToInt, whereCardToInt);
         },
         hilfestapel_Ablagestapel_click() {
             let whichCard = $('#whichCard').val();
@@ -329,21 +196,45 @@ app.component('gameboard', {
             let whereCard = $('#whereCard').val();
             let whereCardToInt = parseInt(whereCard);
             console.log(whereCard + " " + whichCard);
-            //processCommand("hilfestapel_Ablagestapel", whichCardToInt, whereCardToInt);
-            processCmdWS("hilfestapel_Ablagestapel", whichCardToInt, whereCardToInt);
+            this.processCmdWS("hilfestapel_Ablagestapel", whichCardToInt, whereCardToInt);
         },
         spielerstapel_Ablagestapel_click(whereCard) {
             whereCard = $('#whereCard').val();
             whereCardToInt = parseInt(whereCard);
             console.log(whereCard + " " + whichCard);
-            //processCommand("spielerstapel_Ablagestapel", whereCardToInt, "");
-            processCmdWS("spielerstapel_Ablagestapel", whereCardToInt, "");
+            this.processCmdWS("spielerstapel_Ablagestapel", whereCardToInt, "");
         },
     },
     template: `
-    
-    <p> HilfeStapel: </p>
-    <p> Spielerkarten: {{loadFirst}} |  </p>
+    <div>
+    <p> Spielerkarten </p>
+    <img v-bind:src="'/assets/images/' + spielerErsteKarte + 'Card.png'" class = "playerCards">
+    <img v-bind:src="'/assets/images/' + spielerZweiteKarte + 'Card.png'" class = "playerCards">
+    <img v-bind:src="'/assets/images/' + spielerDritteKarte + 'Card.png'" class = "playerCards">
+    <img v-bind:src="'/assets/images/' + spielerVierteKarte + 'Card.png'" class = "playerCards">
+    <img v-bind:src="'/assets/images/' + spielerFünfteKarte + 'Card.png'" class = "playerCards">
+    </div>
+
+
+    <div>
+    <p> Hilfekarten </p>
+    <img v-bind:src="'/assets/images/' + hilfeStapel1 + 'Card.png'" class = "playerCards">
+    <img v-bind:src="'/assets/images/' + hilfeStapel2 + 'Card.png'" class = "playerCards">
+    <img v-bind:src="'/assets/images/' + hilfeStapel3 + 'Card.png'" class = "playerCards">
+    <img v-bind:src="'/assets/images/' + hilfeStapel4 + 'Card.png'" class = "playerCards">
+    </div>
+    <div>
+    <p> Abgelegene Karten </p>
+    <img v-bind:src="'/assets/images/' + ablageStapel1 + 'Card.png'" class = "playerCards">
+    <img v-bind:src="'/assets/images/' + ablageStapel2 + 'Card.png'" class = "playerCards">
+    <img v-bind:src="'/assets/images/' + ablageStapel3 + 'Card.png'" class = "playerCards">
+    <img v-bind:src="'/assets/images/' + ablageStapel4 + 'Card.png'" class = "playerCards">
+    </div>
+    <div>
+    <p> SpielerKarte </p>
+    <img v-bind:src="'/assets/images/' + spielerStapel_Value + 'Card.png'" class = "playerCards">
+    {{spielerStapel_Size}}
+    </div>
     <div class="col-xl-3">
         <button class="gameButton" id="hand_Ablagestapel" v-on:click="hand_Ablagestapel_click"> 
             Karte von Hand auf Ablagestapel

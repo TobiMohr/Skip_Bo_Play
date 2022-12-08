@@ -1,6 +1,6 @@
 * {
     background-color: white;
-    color:black;
+    color: black;
     font-family: Tahoma, Arial, sans-serif;
 }
 
@@ -10,7 +10,7 @@ p {
 
 .header {
     height: 100px;
-    padding: 10px
+    padding: 10px;
     margin: 10px;
     border-width: 10px;
     border-style: solid;
@@ -38,13 +38,13 @@ p {
 
 .boardgap {
     background-color: #008040;
-    }
+}
 
 .spielerStapel {
     background-color: #008040;
 }
 
-.hand{
+.hand {
     background-color: #008040;
 }
 
@@ -84,3 +84,6 @@ p {
     margin: 20px;
 }
 
+.playerCards {
+    margin: 20px;
+}
