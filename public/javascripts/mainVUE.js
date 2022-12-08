@@ -1,6 +1,6 @@
 const app = Vue.createApp({})
 
-app.component('gameBoard', {
+app.component('gameboard', {
     data() {
         return {
             websocketVUE: new WebSocket("ws://localhost:9000/websocket"),
@@ -23,6 +23,30 @@ app.component('gameBoard', {
         this.connectWebSocket();
     },
     computed: {
+
+    },
+    methods: {
+        connectWebSocket() {
+            this.websocketVUE.onopen = function (event) {
+                this.websocketVUE.send("Trying to connect to Server");
+            }
+
+            this.websocketVUE.onclose = function () {
+                console.log("closed")
+            };
+
+            this.websocketVUE.onerror = function (error) {
+            };
+
+            this.websocketVUE.onmessage = function (e) {
+                if (typeof e.data === "string") {
+                    data = JSON.parse(e.data)
+                    updateGameNoAjax()
+                }
+            };
+
+        },
+
         loadFirst() {
             if (current_Player === "Player A") {
                 return getCardImage(this.data.playerA_HelpStacks_0);
@@ -51,40 +75,17 @@ app.component('gameBoard', {
                 return getCardImage(this.data.playerB_HelpStacks_3);
             }
         },
-    },
-    methods: {
-        connectWebSocket() {
-            this.websocketVUE.onopen = function (event) {
-                this.websocketVUE.send("Trying to connect to Server");
-            }
-
-            this.websocketVUE.onclose = function () {
-                console.log("closed")
-            };
-
-            this.websocketVUE.onerror = function (error) {
-            };
-
-            this.websocketVUE.onmessage = function (e) {
-                if (typeof e.data === "string") {
-                    data = JSON.parse(e.data)
-                    updateGameNoAjax()
-                }
-            };
-        },
 
         processCmdWS(cmd, data1, data2) {
             console.log("process " + cmd + ",   " + data1 + ".    " + data2)
-            websocket.send(cmd + "|" + data1 + "|" + data2)
+            websocketVUE.send(cmd + "|" + data1 + "|" + data2)
         },
 
         processCommand(cmd, data, data2) {
             console.log("CMD: " + cmd + " data1: " + data + " data2: " + data2);
             post("POST", "/command", { "cmd": cmd, "data1": data, "data2": data2 }).then(() => {
                 getData().then(() => {
-                    updateInputPanel();
-                    updateGameBoard();
-                    //refreshOnClickEvents();
+
                 })
             })
         },
@@ -109,13 +110,28 @@ app.component('gameBoard', {
             });
         },
 
-        getData() { // hier nochmal drüberschauen !!!!!!!!!!!!!!!!!!
+        getData() {
+
+            let that = this;
+
             return $.ajax({
                 method: "GET",
                 url: "/status",
                 dataType: "json",
                 success: function (response) {
-                    data = response;
+                    that.data = response;
+                    that.playerA_Spielerstapel_Value = response.playerA_Spielerstapel_Value;
+                    that.playerA_Spielerstapel_Size = response.playerA_Spielerstapel_Size;
+                    that.playerB_Spielerstapel_Value = response.playerB_Spielerstapel_Value;
+                    that.playerB_Spielerstapel_Size = response.playerB_Spielerstapel_Size;
+                    that.ablageStapel1 = response.ablagestapel_0;
+                    that.ablageStapel2 = response.ablagestapel_1;
+                    that.ablageStapel3 = response.ablagestapel_2;
+                    that.ablageStapel4 = response.ablagestapel_3;
+                    that.current_Player = response.current_Player;
+                    that.gameState = response.gamestate;
+                    that.statusmessage = response.statusmessage;
+                    that.updateGameBoard();
                 }
             });
         },
@@ -255,31 +271,31 @@ app.component('gameBoard', {
         getCardImage(cardValue) {
             switch (cardValue) {
                 case "1":
-                    return "firstCard.png";
+                    return "<img src='./images/firstCard.png'>";
                 case "2":
-                    return "secondCard.png";
+                    return "<img src='./images/secondCard.png'>";
                 case "3":
-                    return "thirdCard.png";
+                    return "<img src='./images/thirdCard.png'>";
                 case "4":
-                    return "fourthCard.png";
+                    return "<img src='./images/fourthCard.png'>";
                 case "5":
-                    return "fifthCard.png";
+                    return "<img src='./images/fifthCard.png'>";
                 case "6":
-                    return "sixthCard.png";
+                    return "<img src='./images/sixthCard.png'>";
                 case "7":
-                    return "seventhCard.png";
+                    return "<img src='./images/seventhCard.png'>";
                 case "8":
-                    return "eightCard.png";
+                    return "<img src='./images/eightCard.png'>";
                 case "9":
-                    return "ninethCard.png";
+                    return "<img src='./images/ninethCard.png'>";
                 case "10":
-                    return "tenCard.png";
+                    return "<img src='./images/tenCard.png'>";
                 case "11":
-                    return "elevenCard.png";
+                    return "<img src='./images/elevenCard.png'>";
                 case "12":
-                    return "twelveCard.png";
+                    return "<img src='./images/twelveCard.png'>";
                 case "J":
-                    return "jokerCard.png";
+                    return "<img src='./images/jokerCard.png'>";
                 case "":
                     return "leer";
                 default:
@@ -289,6 +305,7 @@ app.component('gameBoard', {
         },
 
         hand_Ablagestapel_click() {
+            console.log("TEST HIER ?");
             let whichCard = $('#whichCard').val();
             let whichCardToInt = parseInt(whichCard);
             let whereCard = $('#whereCard').val();
@@ -324,33 +341,29 @@ app.component('gameBoard', {
         },
     },
     template: `
+    
     <p> HilfeStapel: </p>
-    `,
-})
-app.component('Action-Components', {
-    template: `
+    <p> Spielerkarten: {{loadFirst}} |  </p>
     <div class="col-xl-3">
-        <button class="gameButton" id="hand_Ablagestapel"> 
+        <button class="gameButton" id="hand_Ablagestapel" v-on:click="hand_Ablagestapel_click"> 
             Karte von Hand auf Ablagestapel
         </button>
     </div>
     <div class="col-xl-3">
-        <button class="gameButton" id="hand_Hilfestape">
+        <button class="gameButton" id="hand_Hilfestapel" v-on:click="hand_Hilfestapel_click">
             Karte von Hand auf Hilfestapel
         </button>
     </div>
     <div class="col-xl-3">
-        <button class="gameButton" id="hilfestapel_Ablagestapel">
+        <button class="gameButton" id="hilfestapel_Ablagestapel" v-on:click="hilfestapel_Ablagestapel_click">
             Karte von Hilfestapel auf Ablagestapel
         </button>
     </div>
     <div class="col-xl-3">
-        <button class="gameButton" id="spielerstapel_Ablagestapel">
+        <button class="gameButton" id="spielerstapel_Ablagestapel" v-on:click="spielerstapel_Ablagestapel_click">
             Karte vom Spielerstapel auf Ablagestapel
         </button>
     </div>
-    `
-}
-)
-
+    `,
+})
 app.mount('#Skip_Bo_Game')

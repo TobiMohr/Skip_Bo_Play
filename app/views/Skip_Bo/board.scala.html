@@ -35,20 +35,20 @@
 @main("HTWG Skip Bo") {
 <header class="header">
     <link rel="stylesheet" href='@routes.Assets.versioned("stylesheets/board.css")' />
+</header>
 
-    <div id="Skip_Bo_Game">
-        <gameBoard></gameBoard>
-        <Action-Components></Action-Components>
-    </div>
+<div id="Skip_Bo_Game">
+    <gameBoard></gameBoard>
+</div>
 
-    <div class="gameTextInputs">
-        <label for="whichCard">Welche Karte(Index 1 -> 5): </label>
-        <input class="gameInput" type="text" id="whichCard">
-        <br>
-        <label for="whereCard">Wohin(Index 1 -> 5): </label>
-        <input class="gameInput" type="text" id="whereCard">
-    </div>
-    </div>
-    }
-    <script src="https://unpkg.com/vue@@next"></script>
-    <script src='@routes.Assets.versioned("javascripts/main.js")' type="text/javascript"></script>
+<div class="gameTextInputs">
+    <label for="whichCard">Welche Karte(Index 1 -> 5): </label>
+    <input class="gameInput" type="text" id="whichCard">
+    <br>
+    <label for="whereCard">Wohin(Index 1 -> 5): </label>
+    <input class="gameInput" type="text" id="whereCard">
+</div>
+</div>
+}
+<script src="https://unpkg.com/vue@@next"></script>
+<script src='@routes.Assets.versioned("javascripts/mainVUE.js")'></script>
