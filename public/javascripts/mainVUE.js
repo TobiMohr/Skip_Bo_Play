@@ -57,12 +57,11 @@ app.component('gameboard', {
             };
 
             this.websocketVUE.onmessage = (e) => {
+            console.log("onmessage: ")
+            console.log(e.data)
                 if (typeof e.data === "string") {
                     this.data = JSON.parse(e.data)
-                    this.loadPlayerCards();
-                    this.loadHelpStack();
-                    this.loadAblageStack();
-                    this.loadSpielerStack();
+                    this.getData();
                 }
             };
 
