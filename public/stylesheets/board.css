@@ -87,3 +87,30 @@ p {
 .playerCards {
     margin: 20px;
 }
+
+span {
+    background-color: #008040;
+}
+
+.flexContainer {
+    display: grid;
+    grid-template-columns: 2fr 1fr;
+}
+
+.firstChild {
+    background-color: #008040;
+    padding: 10px;
+    text-align: right;
+    border-width: 8px;
+    border-style: solid;
+    border-color: #80471C;
+}
+
+.secondChild {
+    background-color: #008040;
+    padding: 10px;
+    text-align: left;
+    border-width: 8px;
+    border-style: solid;
+    border-color: #80471C;
+}

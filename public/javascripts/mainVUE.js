@@ -237,34 +237,36 @@ app.component('gameboard', {
         }
     },
     template: `
-    <div>
-    <p> Spielerkarten </p>
-    <img v-bind:src="'/assets/images/' + spielerErsteKarte + 'Card.png'" class = "playerCards" @click="playTheGameWithClicks('Hand 1 ')">
-    <img v-bind:src="'/assets/images/' + spielerZweiteKarte + 'Card.png'" class = "playerCards" @click="playTheGameWithClicks('Hand 2 ')">
-    <img v-bind:src="'/assets/images/' + spielerDritteKarte + 'Card.png'" class = "playerCards" @click="playTheGameWithClicks('Hand 3 ')">
-    <img v-bind:src="'/assets/images/' + spielerVierteKarte + 'Card.png'" class = "playerCards" @click="playTheGameWithClicks('Hand 4 ')">
-    <img v-bind:src="'/assets/images/' + spielerFünfteKarte + 'Card.png'" class = "playerCards" @click="playTheGameWithClicks('Hand 5 ')">
+    <div class="board">
+    <div class ="flexContainer">
+        <div class="firstChild">
+            <span> Karten auf der Hand</span> 
+            <br>
+            <img v-bind:src="'/assets/images/' + spielerErsteKarte + 'Card.png'" class = "playerCards" @click="playTheGameWithClicks('Hand 1 ')">
+            <img v-bind:src="'/assets/images/' + spielerZweiteKarte + 'Card.png'" class = "playerCards" @click="playTheGameWithClicks('Hand 2 ')">
+            <img v-bind:src="'/assets/images/' + spielerDritteKarte + 'Card.png'" class = "playerCards" @click="playTheGameWithClicks('Hand 3 ')">
+            <img v-bind:src="'/assets/images/' + spielerVierteKarte + 'Card.png'" class = "playerCards" @click="playTheGameWithClicks('Hand 4 ')">
+            <img v-bind:src="'/assets/images/' + spielerFünfteKarte + 'Card.png'" class = "playerCards" @click="playTheGameWithClicks('Hand 5 ')">
+        </div>
+        <div class="secondChild">
+            <span> SpielerStapel </span>
+            <br>
+            <img v-bind:src="'/assets/images/' + spielerStapel_Value + 'Card.png'" class = "playerCards" @click="playTheGameWithClicks('Spielerkarte 1 ')">
+            <span>{{spielerStapel_Size}}</span>
+        </div>
     </div>
 
-
-    <div>
     <p> Hilfekarten </p>
     <img v-bind:src="'/assets/images/' + hilfeStapel1 + 'Card.png'" class = "playerCards" @click="playTheGameWithClicks('Hilfe 1 ')">
     <img v-bind:src="'/assets/images/' + hilfeStapel2 + 'Card.png'" class = "playerCards" @click="playTheGameWithClicks('Hilfe 2 ')">
     <img v-bind:src="'/assets/images/' + hilfeStapel3 + 'Card.png'" class = "playerCards" @click="playTheGameWithClicks('Hilfe 3 ')">
     <img v-bind:src="'/assets/images/' + hilfeStapel4 + 'Card.png'" class = "playerCards" @click="playTheGameWithClicks('Hilfe 4 ')">
-    </div>
-    <div>
+
     <p> Abgelegene Karten </p>
     <img v-bind:src="'/assets/images/' + ablageStapel1 + 'Card.png'" class = "playerCards" @click="playTheGameWithClicks('Ablage 1 ')">
     <img v-bind:src="'/assets/images/' + ablageStapel2 + 'Card.png'" class = "playerCards" @click="playTheGameWithClicks('Ablage 2 ')">
     <img v-bind:src="'/assets/images/' + ablageStapel3 + 'Card.png'" class = "playerCards" @click="playTheGameWithClicks('Ablage 3 ')">
     <img v-bind:src="'/assets/images/' + ablageStapel4 + 'Card.png'" class = "playerCards" @click="playTheGameWithClicks('Ablage 4 ')">
-    </div>
-    <div>
-    <p> SpielerKarte </p>
-    <img v-bind:src="'/assets/images/' + spielerStapel_Value + 'Card.png'" class = "playerCards" @click="playTheGameWithClicks('Spielerkarte 1 ')">
-    {{spielerStapel_Size}}
     </div>
     <div class="col-xl-3">
         <button class="gameButton" id="hand_Ablagestapel" v-on:click="hand_Ablagestapel_click"> 
