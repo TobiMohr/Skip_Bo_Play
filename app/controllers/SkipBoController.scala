@@ -102,7 +102,7 @@ class SkipBoController @Inject()(cc: ControllerComponents)(implicit system: Acto
     if (whichCard <= gameController.game.player(player).cards.size - 1) {
         gameController.game.player(player).cards(whichCard).toString()
     } else {
-      ""
+      "0"
     }
     
 
@@ -114,7 +114,7 @@ class SkipBoController @Inject()(cc: ControllerComponents)(implicit system: Acto
 
   def playerHelpStacks(player: Int, value: Int) = {
     if (gameController.game.player(player).helpstack(value).isEmpty) {
-      ""
+      "0"
     } else {
       gameController.game.player(player).helpstack(value).head.toString()
     }

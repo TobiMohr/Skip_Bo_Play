@@ -20,18 +20,20 @@ app.component('gameboard', {
             spielerStapel_Value: "",
             spielerStapel_Size: 0,
 
-            spielerErsteKarte: "",
-            spielerZweiteKarte: "",
-            spielerDritteKarte: "",
-            spielerVierteKarte: "",
-            spielerFünfteKarte: "",
+            spielerErsteKarte: "0",
+            spielerZweiteKarte: "0",
+            spielerDritteKarte: "0",
+            spielerVierteKarte: "0",
+            spielerFünfteKarte: "0",
 
-            hilfeStapel1: "",
-            hilfeStapel2: "",
-            hilfeStapel3: "",
-            hilfeStapel4: "",
+            hilfeStapel1: "0",
+            hilfeStapel2: "0",
+            hilfeStapel3: "0",
+            hilfeStapel4: "0",
 
-            selected: "",
+            selectedCard: 0,
+            whichStack: "",
+            whichCard: null,
 
         }
     },
@@ -115,7 +117,7 @@ app.component('gameboard', {
             }
         },
         processCmdWS(cmd, data1, data2) {
-            console.log("process " + cmd + ",   " + data1 + ".    " + data2)
+            console.log("process " + cmd + "|" + data1 + "|" + data2)
             this.websocketVUE.send(cmd + "|" + data1 + "|" + data2)
         },
 
@@ -166,6 +168,9 @@ app.component('gameboard', {
                     that.current_Player = response.current_Player;
                     that.gameState = response.gamestate;
                     that.statusmessage = response.statusmessage;
+                    that.selectedCard = 0;
+                    that.whichCard = null;
+                    that.whichStack = "";
                     that.loadPlayerCards();
                     that.loadHelpStack();
                     that.loadAblageStack();
@@ -202,36 +207,75 @@ app.component('gameboard', {
             whereCard = $('#whereCard').val();
             whereCardToInt = parseInt(whereCard);
             console.log(whereCard + " " + whichCard);
-            this.processCmdWS("spielerstapel_Ablagestapel", whereCardToInt, "");
+            this.processCmdWS("spielerstapel_Ablagestapel", whereCardToInt, ".");
         },
-        playTheGameWithClicks(whichCard) {
-            let count = 0;
-            for (let i = 0; i < this.selected.length; i++) {
-                if (this.selected[i] === ',') {
-                    count++;
+        selectCard(stacktype, index) {
+            console.log(stacktype);
+            if(stacktype === 'Spielerstapel'){
+                if (this.selectedCard == 1){
+                    this.selectedCard = 0;
+                    this.whichStack = "";
+                } else {
+                    this.selectedCard = 1;
+                    this.whichStack = "Spielerstapel";
+                    this.whichCard = index;
+                }
+            } else if (stacktype === 'Hand'){
+                if(this.selectedCard == index + 1){
+                    this.selectedCard = 0;
+                    this.whichStack = "";
+                    this.whichCard = null;
+                } else {
+                    this.selectedCard = index + 1;
+                    this.whichStack = "Hand";
+                    this.whichCard = index;
+                }
+            } else if (stacktype === 'Help'){
+                if(this.selectedCard == 0){
+                    if((whichCard == 1 && (this.hilfeStapel1 == "0")) ||
+                        (whichCard == 2 && (this.hilfeStapel2 == "0")) ||
+                        (whichCard == 3 && (this.hilfeStapel3 == "0")) ||
+                        (whichCard == 4 && (this.hilfeStapel4 == "0")))
+                    {
+                        return;
+                    }
+                    this.selectedCard = index + 6;
+                    this.whichStack = "Help";
+                    this.whichCard = index;
+                } else if (this.selectedCard == index + 6){
+                    this.selectedCard = 0;
+                    this.whichStack = "";
+                    this.whichCard = null;
+                    console.log("hier");
+                } else {
+                    this.placeCard('Help', index);
                 }
             }
-            if (count === 4) {
-                this.selected = "";
+        },
+        placeCard(stacktype, index){
+            console.log("whichCard: " + this.whichCard);
+            console.log("whichStack: " + this.whichStack);
+            console.log("selectedCard: " + this.selectedCard);
+            if (this.whichCard == null){
+                return;
             }
-            let test = whichCard.split(" ")
-            console.log(test[0]);
-            console.log(test[1]);
-            this.selected += test;
-            console.log(this.selected)
-            if (count === 2) {
-                let arrayStrings = this.selected.split(",");
-                if (arrayStrings[0] === 'Hand' && arrayStrings[2] === 'Hilfe') {
-                    this.processCmdWS("hand_Hilfestapel", parseInt(arrayStrings[1]), parseInt(arrayStrings[3]));
+            if (stacktype === 'Help'){
+                if (this.whichStack === "Spielerstapel"){
+                    return;
+                } else if (this.whichStack === "Hand"){
+                    this.processCmdWS("hand_Hilfestapel", this.whichCard, index);
                 }
-                if (arrayStrings[0] === 'Hand' && arrayStrings[2] === 'Ablage') {
-                    this.processCmdWS("hand_Ablagestapel", parseInt(arrayStrings[1]), parseInt(arrayStrings[3]));
+            }
+            if (stacktype === 'Ablage'){
+                if (this.whichStack === "Spielerstapel"){
+                    console.log("hiii");
+                    this.processCmdWS("spielerstapel_Ablagestapel", index, ".");
                 }
-                if (arrayStrings[0] === 'Hilfe' && arrayStrings[2] === 'Ablage') {
-                    this.processCmdWS("hilfestapel_Ablagestapel", parseInt(arrayStrings[1]), parseInt(arrayStrings[3]));
+                if (this.whichStack === "Hand"){
+                    this.processCmdWS("hand_Ablagestapel", this.whichCard, index);
                 }
-                if (arrayStrings[0] === 'Spielerkarte' && arrayStrings[2] === 'Ablage') {
-                    this.processCmdWS("spielerstapel_Ablagestapel", parseInt(arrayStrings[3], ""));
+                if (this.whichStack === "Help"){
+                    this.processCmdWS("hilfestapel_Ablagestapel", this.whichCard, index);
                 }
             }
         }
@@ -242,51 +286,53 @@ app.component('gameboard', {
         <div class="firstChild">
             <span> Karten auf der Hand</span> 
             <br>
-            <img v-bind:src="'/assets/images/' + spielerErsteKarte + 'Card.png'" class = "playerCards" @click="playTheGameWithClicks('Hand 1 ')">
-            <img v-bind:src="'/assets/images/' + spielerZweiteKarte + 'Card.png'" class = "playerCards" @click="playTheGameWithClicks('Hand 2 ')">
-            <img v-bind:src="'/assets/images/' + spielerDritteKarte + 'Card.png'" class = "playerCards" @click="playTheGameWithClicks('Hand 3 ')">
-            <img v-bind:src="'/assets/images/' + spielerVierteKarte + 'Card.png'" class = "playerCards" @click="playTheGameWithClicks('Hand 4 ')">
-            <img v-bind:src="'/assets/images/' + spielerFünfteKarte + 'Card.png'" class = "playerCards" @click="playTheGameWithClicks('Hand 5 ')">
+            <img v-if="spielerErsteKarte === '0'" v-bind:src="'/assets/images/' + spielerErsteKarte + 'Card.png'" class = "playerCards">
+            <img v-else-if="selectedCard == 2" v-bind:src="'/assets/images/' + spielerErsteKarte + 'Card.png'" class = "playerCardsSelected" @click="selectCard('Hand',1)">
+            <img v-else v-bind:src="'/assets/images/' + spielerErsteKarte + 'Card.png'" class = "playerCards" @click="selectCard('Hand',1)">
+
+            <img v-if="spielerZweiteKarte === '0'" v-bind:src="'/assets/images/' + spielerZweiteKarte + 'Card.png'" class = "playerCards">
+            <img v-else-if="selectedCard == 3" v-bind:src="'/assets/images/' + spielerZweiteKarte + 'Card.png'" class = "playerCardsSelected" @click="selectCard('Hand',2)">
+            <img v-else v-bind:src="'/assets/images/' + spielerZweiteKarte + 'Card.png'" class = "playerCards" @click="selectCard('Hand',2)">
+
+            <img v-if="spielerDritteKarte === '0'" v-bind:src="'/assets/images/' + spielerDritteKarte + 'Card.png'" class = "playerCards">
+            <img v-else-if="selectedCard == 4" v-bind:src="'/assets/images/' + spielerDritteKarte + 'Card.png'" class = "playerCardsSelected" @click="selectCard('Hand',3)">
+            <img v-else v-bind:src="'/assets/images/' + spielerDritteKarte + 'Card.png'" class = "playerCards" @click="selectCard('Hand',3)">
+
+            <img v-if="spielerVierteKarte === '0'" v-bind:src="'/assets/images/' + spielerVierteKarte + 'Card.png'" class = "playerCards">
+            <img v-else-if="selectedCard == 5" v-bind:src="'/assets/images/' + spielerVierteKarte + 'Card.png'" class = "playerCardsSelected" @click="selectCard('Hand',4)">
+            <img v-else v-bind:src="'/assets/images/' + spielerVierteKarte + 'Card.png'" class = "playerCards" @click="selectCard('Hand',4)">
+
+            <img v-if="spielerFünfteKarte === '0'" v-bind:src="'/assets/images/' + spielerFünfteKarte + 'Card.png'" class = "playerCards">
+            <img v-else-if="selectedCard == 6" v-bind:src="'/assets/images/' + spielerFünfteKarte + 'Card.png'" class = "playerCardsSelected" @click="selectCard('Hand',5)">
+            <img v-else v-bind:src="'/assets/images/' + spielerFünfteKarte + 'Card.png'" class = "playerCards" @click="selectCard('Hand',5)">
         </div>
         <div class="secondChild">
             <span> SpielerStapel </span>
             <br>
-            <img v-bind:src="'/assets/images/' + spielerStapel_Value + 'Card.png'" class = "playerCards" @click="playTheGameWithClicks('Spielerkarte 1 ')">
+            <img v-if="selectedCard == 1" v-bind:src="'/assets/images/' + spielerStapel_Value + 'Card.png'" class = "playerCardsSelected" @click="selectCard('Spielerstapel', 0)">
+            <img v-else v-bind:src="'/assets/images/' + spielerStapel_Value + 'Card.png'" class = "playerCards" @click="selectCard('Spielerstapel', 0)">
             <span>{{spielerStapel_Size}}</span>
         </div>
     </div>
 
     <p> Hilfekarten </p>
-    <img v-bind:src="'/assets/images/' + hilfeStapel1 + 'Card.png'" class = "playerCards" @click="playTheGameWithClicks('Hilfe 1 ')">
-    <img v-bind:src="'/assets/images/' + hilfeStapel2 + 'Card.png'" class = "playerCards" @click="playTheGameWithClicks('Hilfe 2 ')">
-    <img v-bind:src="'/assets/images/' + hilfeStapel3 + 'Card.png'" class = "playerCards" @click="playTheGameWithClicks('Hilfe 3 ')">
-    <img v-bind:src="'/assets/images/' + hilfeStapel4 + 'Card.png'" class = "playerCards" @click="playTheGameWithClicks('Hilfe 4 ')">
+    <img v-if="selectedCard == 7 && whichStack === 'Help'" v-bind:src="'/assets/images/' + hilfeStapel1 + 'Card.png'" class = "playerCardsSelected" @click="selectCard('Help', 1)">
+    <img v-else v-bind:src="'/assets/images/' + hilfeStapel1 + 'Card.png'" class = "playerCards" @click="selectCard('Help', 1)">
+
+    <img v-if="selectedCard == 8 && whichStack === 'Help'" v-bind:src="'/assets/images/' + hilfeStapel2 + 'Card.png'" class = "playerCardsSelected" @click="selectCard('Help', 2)">
+    <img v-else v-bind:src="'/assets/images/' + hilfeStapel2 + 'Card.png'" class = "playerCards" @click="selectCard('Help', 2)">
+
+    <img v-if="selectedCard == 9 && whichStack === 'Help'" v-bind:src="'/assets/images/' + hilfeStapel3 + 'Card.png'" class = "playerCardsSelected" @click="selectCard('Help', 3)">
+    <img v-else v-bind:src="'/assets/images/' + hilfeStapel3 + 'Card.png'" class = "playerCards" @click="selectCard('Help', 3)">
+
+    <img v-if="selectedCard == 10 && whichStack === 'Help'" v-bind:src="'/assets/images/' + hilfeStapel4 + 'Card.png'" class = "playerCardsSelected" @click="selectCard('Help', 4)">
+    <img v-else v-bind:src="'/assets/images/' + hilfeStapel4 + 'Card.png'" class = "playerCards" @click="selectCard('Help', 4)">
 
     <p> Abgelegene Karten </p>
-    <img v-bind:src="'/assets/images/' + ablageStapel1 + 'Card.png'" class = "playerCards" @click="playTheGameWithClicks('Ablage 1 ')">
-    <img v-bind:src="'/assets/images/' + ablageStapel2 + 'Card.png'" class = "playerCards" @click="playTheGameWithClicks('Ablage 2 ')">
-    <img v-bind:src="'/assets/images/' + ablageStapel3 + 'Card.png'" class = "playerCards" @click="playTheGameWithClicks('Ablage 3 ')">
-    <img v-bind:src="'/assets/images/' + ablageStapel4 + 'Card.png'" class = "playerCards" @click="playTheGameWithClicks('Ablage 4 ')">
-    </div>
-    <div class="col-xl-3">
-        <button class="gameButton" id="hand_Ablagestapel" v-on:click="hand_Ablagestapel_click"> 
-            Karte von Hand auf Ablagestapel
-        </button>
-    </div>
-    <div class="col-xl-3">
-        <button class="gameButton" id="hand_Hilfestapel" v-on:click="hand_Hilfestapel_click">
-            Karte von Hand auf Hilfestapel
-        </button>
-    </div>
-    <div class="col-xl-3">
-        <button class="gameButton" id="hilfestapel_Ablagestapel" v-on:click="hilfestapel_Ablagestapel_click">
-            Karte von Hilfestapel auf Ablagestapel
-        </button>
-    </div>
-    <div class="col-xl-3">
-        <button class="gameButton" id="spielerstapel_Ablagestapel" v-on:click="spielerstapel_Ablagestapel_click">
-            Karte vom Spielerstapel auf Ablagestapel
-        </button>
+    <img v-bind:src="'/assets/images/' + ablageStapel1 + 'Card.png'" class = "playerCards" @click="placeCard('Ablage', 1)">
+    <img v-bind:src="'/assets/images/' + ablageStapel2 + 'Card.png'" class = "playerCards" @click="placeCard('Ablage', 2)">
+    <img v-bind:src="'/assets/images/' + ablageStapel3 + 'Card.png'" class = "playerCards" @click="placeCard('Ablage', 3)">
+    <img v-bind:src="'/assets/images/' + ablageStapel4 + 'Card.png'" class = "playerCards" @click="placeCard('Ablage', 4)">
     </div>
     `,
 })

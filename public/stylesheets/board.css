@@ -88,6 +88,11 @@ p {
     margin: 20px;
 }
 
+.playerCardsSelected {
+    margin: 20px;
+    border: 5px solid red;
+}
+
 span {
     background-color: #008040;
 }
@@ -113,4 +118,12 @@ span {
     border-width: 8px;
     border-style: solid;
     border-color: #80471C;
+}
+
+/*.selectedMarker {
+    padding: 2px;
+    background: red;
+    width: 10%;
+    height: 40%;
+    margin: 20px;
 }
