@@ -120,6 +120,12 @@ span {
     border-color: #80471C;
 }
 
+.statusMessage {
+    margin-top: 2rem;
+    width: 100%;
+    text-align: center;
+}
+
 /*.selectedMarker {
     padding: 2px;
     background: red;

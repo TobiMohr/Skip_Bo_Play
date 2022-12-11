@@ -232,12 +232,23 @@ app.component('gameboard', {
                 }
             } else if (stacktype === 'Help'){
                 if(this.selectedCard == 0){
-                    if((whichCard == 1 && (this.hilfeStapel1 == "0")) ||
-                        (whichCard == 2 && (this.hilfeStapel2 == "0")) ||
-                        (whichCard == 3 && (this.hilfeStapel3 == "0")) ||
-                        (whichCard == 4 && (this.hilfeStapel4 == "0")))
-                    {
-                        return;
+                    if (index == 1){
+                        if((this.whichCard == null && (this.hilfeStapel1 == "0"))){
+                            return;
+                        }
+                    } else if (index == 2){
+                        console.log(this.whichCard +"  " + this.hilfeStapel2);
+                        if((this.whichCard == null && (this.hilfeStapel2 == "0"))){
+                            return;
+                        }
+                    } else if (index == 3){
+                        if((this.whichCard == null && (this.hilfeStapel3 == "0"))){
+                            return;
+                        }
+                    } else if (index == 4){
+                        if((this.whichCard == null && (this.hilfeStapel4 == "0"))){
+                            return;
+                        }
                     }
                     this.selectedCard = index + 6;
                     this.whichStack = "Help";
@@ -333,6 +344,10 @@ app.component('gameboard', {
     <img v-bind:src="'/assets/images/' + ablageStapel2 + 'Card.png'" class = "playerCards" @click="placeCard('Ablage', 2)">
     <img v-bind:src="'/assets/images/' + ablageStapel3 + 'Card.png'" class = "playerCards" @click="placeCard('Ablage', 3)">
     <img v-bind:src="'/assets/images/' + ablageStapel4 + 'Card.png'" class = "playerCards" @click="placeCard('Ablage', 4)">
+    </div>
+
+    <div name="statusMessage" class="statusMessage">
+        <h2>{{ current_Player }}s turn</h2>
     </div>
     `,
 })
