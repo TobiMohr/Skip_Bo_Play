@@ -15,6 +15,7 @@ GET     /board                      controllers.SkipBoController.board()
 +nocsrf
 POST    /command                    controllers.SkipBoController.processRequest
 
+
 GET     /status                     controllers.SkipBoController.status()
 
 

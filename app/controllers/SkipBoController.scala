@@ -94,7 +94,9 @@ class SkipBoController @Inject()(cc: ControllerComponents)(implicit system: Acto
       "current_Player" -> currentPlayer(),
       "gamestate" -> gameController.gameState,
       "statusmessage" -> gameController.statusText
-    ))
+    )).withHeaders (
+      "Access-Control-Allow-Origin" -> "http://localhost:8080/"
+      )
   }
 
   def playerHand(player: Int, whichCard: Int) = {
@@ -249,6 +251,9 @@ class SkipBoController @Inject()(cc: ControllerComponents)(implicit system: Acto
           val data1 = split_msg(1)
           val data2 = split_msg(2)
           wsCommand(cmd, data1, data2)
+          out ! gameToJson()
+        }
+        else {
           out ! gameToJson()
         }
     }
